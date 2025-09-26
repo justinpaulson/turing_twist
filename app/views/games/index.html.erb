@@ -1,0 +1,42 @@
+<h2>Turing Twist - AI Detection Game</h2>
+
+<p style="margin: 2rem 0; font-size: 1.1rem;">
+  Can you identify the AI players? Join a game where humans and AIs answer questions, then vote to eliminate who they think are the bots!
+</p>
+
+<% if @current_player %>
+  <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
+    You're currently in a game. <%= link_to "Go to your game", game_path(@current_player.game) %>
+  </div>
+<% end %>
+
+<div style="margin-bottom: 2rem;">
+  <%= link_to "Create New Game", new_game_path, style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+</div>
+
+<h3>Available Games</h3>
+
+<% if @games.any? %>
+  <div style="display: grid; gap: 1rem;">
+    <% @games.each do |game| %>
+      <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 4px;">
+        <h4>Game #<%= game.id %></h4>
+        <p>
+          Status: <strong><%= game.status.humanize %></strong><br>
+          Players: <%= game.players.count %> / <%= Game::MAX_PLAYERS %><br>
+          <% if game.waiting? %>
+            <em>Needs <%= [Game::MIN_PLAYERS - game.players.count, 0].max %> more players to start</em>
+          <% end %>
+        </p>
+
+        <% if game.waiting? && !@current_player %>
+          <%= link_to "Join Game", join_game_path(game), data: { turbo_method: :post }, style: "background: #28a745; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+        <% elsif game.active? || game.completed? %>
+          <%= link_to "View Game", game_path(game), style: "background: #6c757d; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p>No games available. Create one to get started!</p>
+<% end %>

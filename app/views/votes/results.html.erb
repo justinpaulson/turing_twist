@@ -1,0 +1,37 @@
+<h2>Voting Results - Round <%= @round.round_number %></h2>
+
+<div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+  <h3>Votes Cast:</h3>
+  <ul>
+    <% @votes.each do |vote| %>
+      <li><%= vote.voter.name %> voted for <%= vote.voted_for.name %></li>
+    <% end %>
+  </ul>
+
+  <% if @eliminated_player %>
+    <div style="background: #fff; border: 2px solid #dc3545; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+      <h4>Eliminated: <%= @eliminated_player.name %></h4>
+      <p>
+        This player was: <strong style="color: <%= @eliminated_player.is_ai? ? '#dc3545' : '#28a745' %>;">
+          <%= @eliminated_player.is_ai? ? 'AN AI' : 'HUMAN' %>
+        </strong>
+      </p>
+    </div>
+  <% end %>
+</div>
+
+<% if @game.completed? %>
+  <%= link_to "View Final Results", game_path(@game), style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+<% else %>
+  <% next_round = @game.current_round_object %>
+  <% if next_round %>
+    <%= link_to "Continue to Next Round", game_round_path(@game, next_round), style: "background: #28a745; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+  <% else %>
+    <p>Preparing next round...</p>
+    <script>
+      setTimeout(function() {
+        window.location.href = '<%= game_path(@game) %>';
+      }, 2000);
+    </script>
+  <% end %>
+<% end %>

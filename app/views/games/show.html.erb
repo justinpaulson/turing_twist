@@ -1,0 +1,114 @@
+<h2>Game #<%= @game.id %></h2>
+
+<div style="background: #f8f9fa; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
+  <p>
+    <strong>Status:</strong> <%= @game.status.humanize %><br>
+    <strong>Round:</strong> <%= @game.current_round %> / <%= @game.round_count %><br>
+    <strong>Players:</strong> <%= @game.players.count %> (<%= @game.active_players.count %> active)
+  </p>
+</div>
+
+<% if @game.waiting? %>
+  <h3>Waiting Room</h3>
+  <p>Waiting for more players to join...</p>
+  <p><strong>Minimum players needed:</strong> <%= Game::MIN_PLAYERS %></p>
+  <p><strong>Current players:</strong> <%= @game.players.count %></p>
+
+  <h4>Players in game:</h4>
+  <ul>
+    <% @game.players.each do |player| %>
+      <li>
+        <%= player.name %>
+        <% if player == @current_player %>(You)<% end %>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if @game.can_start? && @current_player %>
+    <%= link_to "Start Game", start_game_path(@game), data: { turbo_method: :post }, style: "background: #28a745; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+  <% end %>
+
+<% elsif @game.active? && @current_round %>
+
+  <% if @current_round.answering? %>
+    <h3>Round <%= @current_round.round_number %>: Answer Phase</h3>
+
+    <div style="background: white; padding: 1.5rem; border: 2px solid #007bff; border-radius: 8px; margin-bottom: 2rem;">
+      <h4>Question:</h4>
+      <p style="font-size: 1.2rem;"><%= @current_round.question %></p>
+    </div>
+
+    <% if @current_player && !@current_player.is_eliminated? %>
+      <% if @my_answer %>
+        <p style="color: #28a745;">✓ You have submitted your answer. Waiting for other players...</p>
+      <% else %>
+        <%= form_with url: submit_answer_game_round_path(@game, @current_round), local: true do |f| %>
+          <div style="margin-bottom: 1rem;">
+            <%= f.text_area :content, rows: 4, style: "width: 100%; padding: 0.5rem;", placeholder: "Type your answer here...", required: true %>
+          </div>
+          <%= f.submit "Submit Answer", style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer;" %>
+        <% end %>
+      <% end %>
+    <% elsif @current_player&.is_eliminated? %>
+      <p style="color: #dc3545;">You have been eliminated but can watch the rest of the game.</p>
+    <% end %>
+
+  <% elsif @current_round.voting? %>
+    <h3>Round <%= @current_round.round_number %>: Voting Phase</h3>
+
+    <p>Read all the answers and vote for who you think is the AI!</p>
+
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+      <% @answers.each_with_index do |answer, index| %>
+        <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+          <h4>Player <%= index + 1 %></h4>
+          <p><%= answer.content %></p>
+
+          <% if @current_player && !@current_player.is_eliminated? && !@my_vote && answer.player != @current_player %>
+            <%= form_with url: game_round_votes_path(@game, @current_round), local: true do |f| %>
+              <%= f.hidden_field :voted_for_id, value: answer.player_id %>
+              <%= f.submit "Vote for this player", style: "background: #dc3545; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @my_vote %>
+      <p style="color: #28a745;">✓ You have voted. Waiting for other players...</p>
+    <% end %>
+
+  <% end %>
+
+<% elsif @game.completed? %>
+  <h3>Game Over!</h3>
+
+  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+    <% remaining_players = @game.active_players %>
+    <% ai_count = remaining_players.where(is_ai: true).count %>
+    <% human_count = remaining_players.where(is_ai: false).count %>
+
+    <% if ai_count == 0 %>
+      <h4 style="color: #28a745;">Humans Win!</h4>
+      <p>All AI players have been eliminated!</p>
+    <% elsif ai_count >= human_count %>
+      <h4 style="color: #dc3545;">AIs Win!</h4>
+      <p>The AIs survived and are now in the majority!</p>
+    <% else %>
+      <h4>Game Complete</h4>
+    <% end %>
+
+    <h4>Final Players:</h4>
+    <ul>
+      <% @game.players.each do |player| %>
+        <li>
+          <%= player.name %> -
+          <strong><%= player.is_ai? ? "AI" : "Human" %></strong>
+          <% if player.is_eliminated? %>(Eliminated)<% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <%= link_to "Back to Games", games_path, style: "background: #6c757d; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 1rem;" %>
+<% end %>

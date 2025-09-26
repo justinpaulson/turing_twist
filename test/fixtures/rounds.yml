@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  game: one
+  round_number: 1
+  question: MyText
+  status: 1
+  started_at: 2025-09-25 16:15:29
+  ended_at: 2025-09-25 16:15:29
+
+two:
+  game: two
+  round_number: 1
+  question: MyText
+  status: 1
+  started_at: 2025-09-25 16:15:29
+  ended_at: 2025-09-25 16:15:29

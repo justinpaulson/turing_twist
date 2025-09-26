@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  round: one
+  player: one
+  content: MyText
+  submitted_at: 2025-09-25 16:15:46
+
+two:
+  round: two
+  player: two
+  content: MyText
+  submitted_at: 2025-09-25 16:15:46
