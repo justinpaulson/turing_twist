@@ -1,24 +1,195 @@
-# README
+# Turing Twist 🤖🎮
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A social deduction party game where players try to identify AI players among human participants. Inspired by the Turing Test, players answer personal questions and vote on who they think is human or AI.
 
-Things you may want to cover:
+## Game Overview
 
-* Ruby version
+Turing Twist is a multiplayer web game that challenges players to distinguish between human and AI responses. In each round:
+1. Players answer personal questions
+2. Everyone reads anonymous responses
+3. Players vote on which answers came from AI
+4. Points are awarded for correct identifications
+5. Players with the lowest scores are eliminated
 
-* System dependencies
+The twist? There are always 2 AI players in the mix, powered by LLM technology, making their responses surprisingly human-like!
 
-* Configuration
+## Features
 
-* Database creation
+- **Real-time multiplayer gameplay** - 5-8 players per game
+- **AI integration** - 2 AI players with unique personas in every game
+- **Session-based authentication** - Secure user sessions with bcrypt
+- **Progressive elimination** - Players are eliminated based on voting accuracy
+- **Diverse question pool** - 15+ thought-provoking personal questions
+- **Modern Rails stack** - Built with Rails 8, Hotwire, and Stimulus
 
-* Database initialization
+## Tech Stack
 
-* How to run the test suite
+- **Ruby** 3.3.4
+- **Rails** 8.0.3
+- **Database** SQLite3
+- **Frontend** Hotwire (Turbo + Stimulus) with Import Maps
+- **AI Integration** ruby_llm gem
+- **Authentication** Rails built-in authentication with bcrypt
+- **Deployment** Docker-ready with Kamal support
 
-* Services (job queues, cache servers, search engines, etc.)
+## Prerequisites
 
-* Deployment instructions
+- Ruby 3.3.4 or higher
+- Rails 8.0.3 or higher
+- SQLite3
+- Bundler
+- Node.js (for JavaScript runtime)
 
-* ...
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/turing_twist.git
+cd turing_twist
+```
+
+2. Install dependencies:
+```bash
+bundle install
+```
+
+3. Set up the database:
+```bash
+rails db:create
+rails db:migrate
+rails db:seed  # Optional: adds sample data
+```
+
+4. Configure AI integration (if using ruby_llm):
+```bash
+# Add your LLM API credentials to credentials
+rails credentials:edit
+```
+
+Add:
+```yaml
+llm:
+  api_key: your_api_key_here
+  model: gpt-4  # or your preferred model
+```
+
+## Running the Application
+
+### Development Mode
+
+```bash
+# Start the Rails server
+rails server
+
+# Or use the Procfile for development (includes asset watching)
+bin/dev
+```
+
+Visit `http://localhost:3000` to play!
+
+### Running Tests
+
+```bash
+# Run the full test suite
+rails test
+
+# Run specific test files
+rails test test/models/game_test.rb
+
+# Run system tests
+rails test:system
+```
+
+### Code Quality
+
+```bash
+# Run RuboCop for code style
+bundle exec rubocop
+
+# Run Brakeman for security analysis
+bundle exec brakeman
+```
+
+## How to Play
+
+1. **Create an Account** - Sign up with email and password
+2. **Start or Join a Game** - Create a new game room or join an existing one
+3. **Wait for Players** - Games need 5-8 players to start (including 2 AI players)
+4. **Answer Questions** - Each round presents a personal question to answer
+5. **Vote on Responses** - Read all anonymous answers and vote for who you think is AI
+6. **Score Points** - Earn points for correctly identifying AI responses
+7. **Survive Elimination** - Players with the lowest scores are eliminated each round
+8. **Win the Game** - Be the last human standing!
+
+## Game Rules
+
+- **Minimum Players**: 5 (including 2 AI)
+- **Maximum Players**: 8 (including 2 AI)
+- **AI Players**: Always 2 per game
+- **Scoring**:
+  - Correct AI identification: +10 points
+  - Incorrect vote: 0 points
+- **Elimination**: Lowest scoring player(s) each round
+- **Victory**: Last remaining human player wins
+
+## Project Structure
+
+```
+turing_twist/
+├── app/
+│   ├── controllers/     # Game logic and request handling
+│   ├── models/          # Game, Player, Round, Answer, Vote models
+│   ├── views/           # ERB templates for UI
+│   └── javascript/      # Stimulus controllers
+├── config/              # Rails configuration
+├── db/                  # Database schema and migrations
+├── test/                # Test suite
+└── public/              # Static assets
+```
+
+## Key Models
+
+- **Game** - Manages game state and players
+- **Player** - Represents human or AI participants
+- **Round** - Handles questions and voting phases
+- **Answer** - Stores player responses to questions
+- **Vote** - Records voting decisions
+- **User** - Manages authentication and profiles
+
+## Deployment
+
+### Docker Deployment
+
+```bash
+# Build the Docker image
+docker build -t turing_twist .
+
+# Run with Docker
+docker run -p 3000:3000 turing_twist
+```
+
+### Kamal Deployment
+
+```bash
+# Configure deploy settings in config/deploy.yml
+kamal setup
+kamal deploy
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Inspired by the Turing Test concept by Alan Turing
+- Built with Ruby on Rails and the amazing Rails community
+- AI responses powered by modern LLM technology
