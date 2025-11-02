@@ -23,7 +23,7 @@ class Player < ApplicationRecord
     if is_ai?
       "Player #{id}"
     else
-      user.email_address.split('@').first.capitalize
+      user.email_address.split("@").first.capitalize
     end
   end
 

@@ -7,12 +7,12 @@ Rails.application.routes.draw do
       post :join
       post :start
     end
-    resources :rounds, only: [:show], param: :round_number do
+    resources :rounds, only: [ :show ], param: :round_number do
       member do
         post :submit_answer
         post :start_voting
       end
-      resources :votes, only: [:create] do
+      resources :votes, only: [ :create ] do
         collection do
           get :results
         end

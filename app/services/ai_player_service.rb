@@ -34,7 +34,7 @@ class AiPlayerService
 
     # Get answers grouped by player, excluding this AI and already voted players
     already_voted_ids = player.votes_cast.where(round: round).pluck(:voted_for_id)
-    available_players = round.game.active_players.where.not(id: [player.id] + already_voted_ids)
+    available_players = round.game.active_players.where.not(id: [ player.id ] + already_voted_ids)
 
     return if available_players.empty?
 
@@ -105,7 +105,7 @@ class AiPlayerService
   def parse_vote_response_from_players(response, available_players)
     # Extract number from response
     content = response.is_a?(String) ? response : response.content
-    number = content.strip.gsub(/\D/, '').to_i
+    number = content.strip.gsub(/\D/, "").to_i
 
     # Default to random player if parsing fails
     return available_players.sample.id if number < 1 || number > available_players.count

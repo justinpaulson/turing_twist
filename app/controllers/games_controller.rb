@@ -1,10 +1,10 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:show, :join, :start]
+  before_action :set_game, only: [ :show, :join, :start ]
 
   def index
     # Active games: waiting games that haven't started yet (joinable)
     # Only show public games (no password) in the general listing
-    @active_games = Game.includes(:players).where(status: :waiting, password: [nil, '']).order(created_at: :desc)
+    @active_games = Game.includes(:players).where(status: :waiting, password: [ nil, "" ]).order(created_at: :desc)
 
     # My games: games where the current user is a player
     # Sort by status (waiting/active first, then completed) and then by created_at
