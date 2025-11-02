@@ -23,6 +23,9 @@ gem "bcrypt", "~> 3.1.7"
 # AI integration
 gem "ruby_llm"
 
+# TipJar for donations
+gem "rails_tipjar"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
