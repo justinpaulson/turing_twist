@@ -2,8 +2,14 @@
   <div class="box" style="width: 100%; max-width: 500px;">
     <h2 style="text-align: center; margin-bottom: 0.5rem;">SIGN IN</h2>
     <p style="text-align: center; margin-bottom: 2rem; font-family: 'Courier New', monospace; font-size: 0.9rem;">
-      Enter your credentials to continue
+      Enter your email and password to sign in
     </p>
+    <div style="text-align: center; margin-bottom: 1.5rem; padding: 1rem; border: 2px dashed #000; background: #f5f5f5;">
+      <p style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin: 0; line-height: 1.5;">
+        <strong>► NEW PLAYER?</strong><br>
+        No account needed! Just enter any email and create a password to start playing.
+      </p>
+    </div>
 
     <%= form_with url: session_path, html: { style: "display: flex; flex-direction: column; gap: 2rem;" } do |form| %>
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">

@@ -1,0 +1,155 @@
+<% content_for(:title, "Turing Twist - The AI Deception Game") %>
+
+<div style="font-family: Georgia, serif; max-width: 900px; margin: 0 auto;">
+  <!-- Masthead -->
+  <div style="text-align: center; border: 4px solid #000; padding: 2rem 1rem; margin-bottom: 2rem; background: #fff;">
+    <div style="border-bottom: 2px solid #000; padding-bottom: 1rem; margin-bottom: 1rem;">
+      <h1 style="font-size: 3.5rem; font-weight: 900; margin: 0; line-height: 1; text-transform: uppercase; letter-spacing: 4px;">
+        TURING TWIST
+      </h1>
+      <p style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin: 0.5rem 0 0 0; letter-spacing: 2px;">
+        THE AI DECEPTION GAME
+      </p>
+    </div>
+    <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+      Vol. 1 &nbsp;|&nbsp; Est. 2025 &nbsp;|&nbsp; Players: <%= User.count %> &nbsp;|&nbsp; Games: <%= Game.count %>
+    </div>
+  </div>
+
+  <!-- Main Story -->
+  <div style="border: 4px solid #000; padding: 2rem; margin-bottom: 2rem; background: #fff;">
+    <h2 style="font-size: 2rem; font-weight: 900; margin: 0 0 1rem 0; text-transform: uppercase; border-bottom: 3px solid #000; padding-bottom: 0.5rem;">
+      Can You Spot the Machine?
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+      <div>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin: 0 0 1rem 0;">
+          In a world where AI can write like humans, <strong>Turing Twist</strong> puts your detection skills to the ultimate test.
+        </p>
+        <p style="line-height: 1.6; margin: 0 0 1rem 0;">
+          Hidden among the players are AI impostors who answer prompts alongside humans. Can you spot who's real and who's artificial?
+        </p>
+      </div>
+      <div style="border: 3px solid #000; padding: 1rem; background: #f5f5f5;">
+        <h3 style="font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; margin: 0 0 0.5rem 0; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 0.25rem;">
+          ► How to Play
+        </h3>
+        <ol style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.8; margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+          <li>Join or create a game</li>
+          <li>Answer creative prompts</li>
+          <li>Vote on who's the AI</li>
+          <li>Score points for deception</li>
+        </ol>
+      </div>
+    </div>
+
+    <div style="border-top: 2px dashed #000; padding-top: 1.5rem; margin-top: 1.5rem;">
+      <h3 style="font-size: 1.3rem; font-weight: bold; margin: 0 0 1rem 0; text-transform: uppercase;">
+        Why You'll Love It
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div style="border: 2px solid #000; padding: 1rem;">
+          <h4 style="font-family: 'Courier New', monospace; font-weight: bold; margin: 0 0 0.5rem 0;">
+            ■ Mind Games
+          </h4>
+          <p style="font-size: 0.95rem; line-height: 1.5; margin: 0;">
+            Outsmart your friends by blending in or standing out at just the right moments.
+          </p>
+        </div>
+        <div style="border: 2px solid #000; padding: 1rem;">
+          <h4 style="font-family: 'Courier New', monospace; font-weight: bold; margin: 0 0 0.5rem 0;">
+            ■ Quick Rounds
+          </h4>
+          <p style="font-size: 0.95rem; line-height: 1.5; margin: 0;">
+            Perfect for game nights. Each round takes just minutes to play.
+          </p>
+        </div>
+        <div style="border: 2px solid #000; padding: 1rem;">
+          <h4 style="font-family: 'Courier New', monospace; font-weight: bold; margin: 0 0 0.5rem 0;">
+            ■ Creative Prompts
+          </h4>
+          <p style="font-size: 0.95rem; line-height: 1.5; margin: 0;">
+            From silly to serious, every question brings surprising answers.
+          </p>
+        </div>
+        <div style="border: 2px solid #000; padding: 1rem;">
+          <h4 style="font-family: 'Courier New', monospace; font-weight: bold; margin: 0 0 0.5rem 0;">
+            ■ Social Fun
+          </h4>
+          <p style="font-size: 0.95rem; line-height: 1.5; margin: 0;">
+            Play with 3-8 friends in real-time. Laughter guaranteed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call to Action -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <% if authenticated? %>
+      <%= link_to games_path, style: "text-decoration: none;" do %>
+        <div style="border: 4px solid #000; padding: 2rem; text-align: center; background: #000; color: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#000'">
+          <div style="font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
+            ► VIEW GAMES
+          </div>
+          <div style="font-size: 0.9rem;">
+            Join an existing game or start a new one
+          </div>
+        </div>
+      <% end %>
+      <%= link_to new_game_path, style: "text-decoration: none;" do %>
+        <div style="border: 4px solid #000; padding: 2rem; text-align: center; background: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'">
+          <div style="font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
+            + NEW GAME
+          </div>
+          <div style="font-size: 0.9rem; color: #333;">
+            Create a game and invite your friends
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <%= link_to new_session_path, style: "text-decoration: none;" do %>
+        <div style="border: 4px solid #000; padding: 2rem; text-align: center; background: #000; color: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#000'">
+          <div style="font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
+            ► SIGN IN
+          </div>
+          <div style="font-size: 0.9rem;">
+            (or create an account)
+          </div>
+        </div>
+      <% end %>
+      <%= link_to games_path, style: "text-decoration: none;" do %>
+        <div style="border: 4px solid #000; padding: 2rem; text-align: center; background: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'">
+          <div style="font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
+            ► VIEW GAMES
+          </div>
+          <div style="font-size: 0.9rem; color: #333;">
+            Browse active games (sign in required to play)
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Bottom Info -->
+  <div style="border: 4px solid #000; padding: 1.5rem; background: #f5f5f5; font-family: 'Courier New', monospace;">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">
+        ▼ THE RULES ▼
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; line-height: 1.6;">
+      <div>
+        <strong>GAMEPLAY:</strong><br>
+        Answer questions<br>
+        Guess who the AI is
+      </div>
+      <div>
+        <strong>SCORING:</strong><br>
+        Points for guessing AI<br>
+        Points for fooling players
+      </div>
+    </div>
+  </div>
+</div>
