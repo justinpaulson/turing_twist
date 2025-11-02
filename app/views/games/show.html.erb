@@ -175,7 +175,7 @@
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      function initializeWaitingPageFeatures() {
         // Tooltip functionality
         const triggers = document.querySelectorAll('.info-tooltip-trigger');
 
@@ -221,7 +221,11 @@
             });
           });
         }
-      });
+      }
+
+      // Support both regular page loads and Turbo navigation
+      document.addEventListener('DOMContentLoaded', initializeWaitingPageFeatures);
+      document.addEventListener('turbo:load', initializeWaitingPageFeatures);
     </script>
   </div>
 

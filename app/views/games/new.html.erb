@@ -40,7 +40,7 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  function initializePasswordToggle() {
     const toggle = document.getElementById('password_toggle');
     const passwordField = document.getElementById('password_field');
     const passwordInput = document.getElementById('password_input');
@@ -57,7 +57,11 @@
         }
       });
     }
-  });
+  }
+
+  // Support both regular page loads and Turbo navigation
+  document.addEventListener('DOMContentLoaded', initializePasswordToggle);
+  document.addEventListener('turbo:load', initializePasswordToggle);
 </script>
 
 <%= link_to "← BACK TO GAMES", games_path, class: "btn" %>

@@ -101,7 +101,7 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  function initializeGameIndexFeatures() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -118,40 +118,44 @@
         document.getElementById(targetTab).style.display = 'block';
       });
     });
-  });
 
-  // Password prompt for private games
-  const joinPrivateBtns = document.querySelectorAll('.join-private-game-btn');
+    // Password prompt for private games
+    const joinPrivateBtns = document.querySelectorAll('.join-private-game-btn');
 
-  joinPrivateBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const gameId = this.dataset.gameId;
-      const password = prompt('This is a private game. Please enter the password:');
+    joinPrivateBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const gameId = this.dataset.gameId;
+        const password = prompt('This is a private game. Please enter the password:');
 
-      if (password !== null && password.trim() !== '') {
-        // Create a form and submit it
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/games/${gameId}/join`;
+        if (password !== null && password.trim() !== '') {
+          // Create a form and submit it
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = `/games/${gameId}/join`;
 
-        // Add CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = 'authenticity_token';
-        csrfInput.value = csrfToken;
-        form.appendChild(csrfInput);
+          // Add CSRF token
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'authenticity_token';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
 
-        // Add password field
-        const passwordInput = document.createElement('input');
-        passwordInput.type = 'hidden';
-        passwordInput.name = 'password';
-        passwordInput.value = password;
-        form.appendChild(passwordInput);
+          // Add password field
+          const passwordInput = document.createElement('input');
+          passwordInput.type = 'hidden';
+          passwordInput.name = 'password';
+          passwordInput.value = password;
+          form.appendChild(passwordInput);
 
-        document.body.appendChild(form);
-        form.submit();
-      }
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
     });
-  });
+  }
+
+  // Support both regular page loads and Turbo navigation
+  document.addEventListener('DOMContentLoaded', initializeGameIndexFeatures);
+  document.addEventListener('turbo:load', initializeGameIndexFeatures);
 </script>
