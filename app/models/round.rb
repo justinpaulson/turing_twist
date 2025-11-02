@@ -3,28 +3,42 @@ class Round < ApplicationRecord
   has_many :answers, dependent: :destroy
   has_many :votes, dependent: :destroy
 
-  enum :status, { answering: 0, voting: 1, completed: 2 }
+  enum :status, { answering: 0, reviewing: 1, voting: 2, completed: 3 }
+
+  # Use round_number in URLs instead of id
+  def to_param
+    round_number.to_s
+  end
 
   QUESTIONS = [
-    "What is your favorite childhood memory?",
-    "If you could have dinner with anyone from history, who would it be and why?",
-    "What's the most embarrassing thing that ever happened to you?",
-    "What would you do if you won the lottery tomorrow?",
-    "Describe your perfect day from start to finish.",
-    "What's a secret talent you have that most people don't know about?",
-    "If you could live anywhere in the world, where would it be and why?",
-    "What's the best advice you've ever received?",
-    "What fear would you like to overcome?",
-    "What makes you feel most alive?",
-    "If you could change one thing about the world, what would it be?",
-    "What's your biggest regret in life?",
-    "Describe a time when you felt truly proud of yourself.",
-    "What's the most spontaneous thing you've ever done?",
-    "If you could master any skill instantly, what would it be?"
+    "What's your favorite color and why does it matter?",
+    "Why are dogs better than cats (or are they)?",
+    "Pineapple on pizza - defend your position.",
+    "Why are you a morning person or night owl?",
+    "What's your weirdest habit that would make people judge you?",
+    "Coffee or tea and why is the other one terrible?",
+    "What's your guilty pleasure song that you're embarrassed about?",
+    "Beach or mountains and why is the other boring?",
+    "What's your phone wallpaper right now and why?",
+    "Sweet or savory - why are you choosing wrong?",
+    "What's the last embarrassing thing you googled?",
+    "Socks with sandals: defend it or roast it.",
+    "What's your worst cooking disaster story?",
+    "What's a popular opinion that you actually disagree with?",
+    "What emoji do you overuse and why?"
   ]
 
-  def self.generate_question
-    QUESTIONS.sample
+  def self.generate_question(game)
+    # Get all previously used questions in this game
+    used_questions = game.rounds.pluck(:question)
+
+    # Get available questions that haven't been used yet
+    available_questions = QUESTIONS - used_questions
+
+    # If we've used all questions, start over (shouldn't happen with 15 questions and 5 rounds)
+    available_questions = QUESTIONS if available_questions.empty?
+
+    available_questions.sample
   end
 
   def all_players_answered?
@@ -34,7 +48,8 @@ class Round < ApplicationRecord
   end
 
   def voting_complete?
-    expected_count = game.active_players.count
+    # Each active player should vote for 2 players
+    expected_count = game.active_players.count * Vote::MAX_VOTES_PER_PLAYER
     actual_count = votes.count
     expected_count > 0 && actual_count >= expected_count
   end

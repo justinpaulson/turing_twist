@@ -1,42 +1,157 @@
-<h2>Turing Twist - AI Detection Game</h2>
+<h2>AI DETECTION GAME</h2>
 
 <p style="margin: 2rem 0; font-size: 1.1rem;">
-  Can you identify the AI players? Join a game where humans and AIs answer questions, then vote to eliminate who they think are the bots!
+  Can you identify the AI players? Join a game where humans and AIs answer questions, vote for who you think are the bots, and score points for correct guesses and for fooling others into thinking you're an AI!
 </p>
 
-<% if @current_player %>
-  <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
-    You're currently in a game. <%= link_to "Go to your game", game_path(@current_player.game) %>
-  </div>
-<% end %>
-
 <div style="margin-bottom: 2rem;">
-  <%= link_to "Create New Game", new_game_path, style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+  <%= link_to "CREATE NEW GAME", new_game_path, class: "btn" %>
 </div>
 
-<h3>Available Games</h3>
+<div class="game-tabs">
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-tab="active-games">ACTIVE GAMES</button>
+    <button class="tab-btn" data-tab="my-games">MY GAMES</button>
+  </div>
 
-<% if @games.any? %>
-  <div style="display: grid; gap: 1rem;">
-    <% @games.each do |game| %>
-      <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 4px;">
-        <h4>Game #<%= game.id %></h4>
-        <p>
-          Status: <strong><%= game.status.humanize %></strong><br>
-          Players: <%= game.players.count %> / <%= Game::MAX_PLAYERS %><br>
-          <% if game.waiting? %>
-            <em>Needs <%= [Game::MIN_PLAYERS - game.players.count, 0].max %> more players to start</em>
-          <% end %>
-        </p>
+  <div class="tab-content" id="active-games">
+    <% if @active_games.any? %>
+      <div style="display: grid; gap: 1.5rem;">
+        <% @active_games.each do |game| %>
+          <div class="box">
+            <div class="box-header" style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>GAME #<%= game.id %></span>
+              <% if game.private? %>
+                <%= image_tag "lock.svg", style: "width: 20px; height: 20px; display: inline-block; vertical-align: middle;" %>
+              <% end %>
+            </div>
+            <p style="font-family: 'Courier New', monospace;">
+              <strong>STATUS:</strong> <%= game.status.humanize.upcase %><br>
+              <strong>PLAYERS:</strong> <%= game.players.count %> / <%= Game::MAX_PLAYERS %><br>
+              <strong>WAITING FOR:</strong> <%= [Game::MIN_PLAYERS - game.players.count, 0].max %> more players to start<br>
+              <% if game.private? %>
+                <strong>TYPE:</strong> PRIVATE (PASSWORD REQUIRED)<br>
+              <% end %>
+            </p>
 
-        <% if game.waiting? && !@current_player %>
-          <%= link_to "Join Game", join_game_path(game), data: { turbo_method: :post }, style: "background: #28a745; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
-        <% elsif game.active? || game.completed? %>
-          <%= link_to "View Game", game_path(game), style: "background: #6c757d; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
+            <div style="margin-top: 1rem;">
+              <% if game.private? %>
+                <button class="btn join-private-game-btn" data-game-id="<%= game.id %>">JOIN GAME</button>
+              <% else %>
+                <%= link_to "JOIN GAME", join_game_path(game), data: { turbo_method: :post }, class: "btn" %>
+              <% end %>
+            </div>
+          </div>
         <% end %>
+      </div>
+    <% else %>
+      <div class="box" style="text-align: center; padding: 3rem;">
+        <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">No active games available. Create one to get started!</p>
       </div>
     <% end %>
   </div>
-<% else %>
-  <p>No games available. Create one to get started!</p>
-<% end %>
+
+  <div class="tab-content" id="my-games" style="display: none;">
+    <% if @my_games.any? %>
+      <div style="display: grid; gap: 1.5rem;">
+        <% @my_games.each do |game| %>
+          <% if game.completed? %>
+            <div class="box game-completed">
+              <div class="box-header">
+                GAME #<%= game.id %> ★ COMPLETED
+              </div>
+              <p style="font-family: 'Courier New', monospace;">
+                <strong>FINAL STATUS:</strong> <%= game.status.humanize.upcase %><br>
+                <strong>PLAYERS:</strong> <%= game.players.count %> / <%= Game::MAX_PLAYERS %><br>
+                <strong>ROUNDS PLAYED:</strong> <%= game.round_count %>
+              </p>
+
+              <div style="margin-top: 1rem;">
+                <%= link_to "VIEW RESULTS", game_path(game), class: "btn" %>
+              </div>
+            </div>
+          <% else %>
+            <div class="box">
+              <div class="box-header">
+                GAME #<%= game.id %> ★ YOUR GAME
+              </div>
+              <p style="font-family: 'Courier New', monospace;">
+                <strong>STATUS:</strong> <%= game.status.humanize.upcase %><br>
+                <strong>PLAYERS:</strong> <%= game.players.count %> / <%= Game::MAX_PLAYERS %><br>
+                <% if game.waiting? %>
+                  <strong>WAITING FOR:</strong> <%= [Game::MIN_PLAYERS - game.players.count, 0].max %> more players to start
+                <% elsif game.active? %>
+                  <strong>ROUND:</strong> <%= game.current_round %> / <%= Game::TOTAL_ROUNDS %>
+                <% end %>
+              </p>
+
+              <div style="margin-top: 1rem;">
+                <%= link_to "GO TO GAME", game_path(game), class: "btn" %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="box" style="text-align: center; padding: 3rem;">
+        <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">You haven't joined any games yet. Join or create a game to get started!</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+
+        // Remove active class from all buttons and hide all content
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.style.display = 'none');
+
+        // Add active class to clicked button and show corresponding content
+        this.classList.add('active');
+        document.getElementById(targetTab).style.display = 'block';
+      });
+    });
+  });
+
+  // Password prompt for private games
+  const joinPrivateBtns = document.querySelectorAll('.join-private-game-btn');
+
+  joinPrivateBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const gameId = this.dataset.gameId;
+      const password = prompt('This is a private game. Please enter the password:');
+
+      if (password !== null && password.trim() !== '') {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/games/${gameId}/join`;
+
+        // Add CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Add password field
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'hidden';
+        passwordInput.name = 'password';
+        passwordInput.value = password;
+        form.appendChild(passwordInput);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+  });
+</script>

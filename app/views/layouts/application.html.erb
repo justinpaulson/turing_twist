@@ -23,17 +23,19 @@
   </head>
 
   <body>
-    <header style="background: #333; color: white; padding: 1rem;">
+    <header style="background: #000000; color: #ffffff; padding: 1rem; border-bottom: 4px solid #000000;">
       <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="margin: 0; font-size: 1.5rem;">
-          <%= link_to "Turing Twist", root_path, style: "color: white; text-decoration: none;" %>
+        <h1 style="margin: 0; font-size: 1.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">
+          <%= link_to "TURING TWIST", root_path, style: "color: #ffffff; text-decoration: none;" %>
         </h1>
-        <nav>
+        <nav style="display: flex; gap: 1.5rem; align-items: center; font-family: 'Courier New', monospace;">
           <% if authenticated? %>
-            <span style="margin-right: 1rem;"><%= Current.user.email_address %></span>
-            <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, style: "color: white;" %>
+            <span style="color: #ffffff; font-size: 0.9rem;">
+              <%= Current.user.email_address %>
+            </span>
+            <%= link_to "SIGN OUT", session_path, data: { turbo_method: :delete }, style: "color: #ffffff; text-decoration: none; font-weight: bold; border: 2px solid #ffffff; padding: 0.5rem 1rem;" %>
           <% else %>
-            <%= link_to "Sign In", new_session_path, style: "color: white;" %>
+            <%= link_to "SIGN IN", new_session_path, style: "color: #ffffff; text-decoration: none; font-weight: bold; border: 2px solid #ffffff; padding: 0.5rem 1rem;" %>
           <% end %>
         </nav>
       </div>
@@ -41,17 +43,21 @@
 
     <main style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
       <% if notice.present? %>
-        <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-          <%= notice %>
+        <div class="notice">
+          ℹ <%= notice %>
         </div>
       <% end %>
       <% if alert.present? %>
-        <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-          <%= alert %>
+        <div class="alert">
+          ⚠ <%= alert %>
         </div>
       <% end %>
 
       <%= yield %>
     </main>
+
+    <footer style="max-width: 1200px; margin: 3rem auto 1rem; padding: 1rem; text-align: center; border-top: 4px solid #000000; font-family: 'Courier New', monospace; font-size: 0.8rem;">
+      © 2025 TURING TWIST
+    </footer>
   </body>
 </html>

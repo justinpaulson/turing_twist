@@ -2,23 +2,27 @@
 
 A social deduction party game where players try to identify AI players among human participants. Inspired by the Turing Test, players answer personal questions and vote on who they think is human or AI.
 
+## Design Theme
+
+Turing Twist features a **black and white newspaper style** with **old school Nintendo graphics** aesthetic. The visual design combines the classic look of newspaper print with retro 8-bit gaming elements, creating a unique vintage computing experience. See `claude.md` for detailed design system documentation.
+
 ## Game Overview
 
-Turing Twist is a multiplayer web game that challenges players to distinguish between human and AI responses. In each round:
+Turing Twist is a multiplayer web game that challenges players to distinguish between human and AI responses. Each game consists of 5 rounds where:
 1. Players answer personal questions
-2. Everyone reads anonymous responses
-3. Players vote on which answers came from AI
-4. Points are awarded for correct identifications
-5. Players with the lowest scores are eliminated
+2. Everyone reads all anonymous responses
+3. Players vote for who they think the 2 AI players are
+4. Points are awarded for correct AI identifications
+5. Bonus points for fooling other players into thinking you're an AI!
 
-The twist? There are always 2 AI players in the mix, powered by LLM technology, making their responses surprisingly human-like!
+The twist? There are always 2 AI players in the mix, powered by LLM technology, making their responses surprisingly human-like! After 5 rounds, the player with the highest score wins!
 
 ## Features
 
 - **Real-time multiplayer gameplay** - 5-8 players per game
 - **AI integration** - 2 AI players with unique personas in every game
 - **Session-based authentication** - Secure user sessions with bcrypt
-- **Progressive elimination** - Players are eliminated based on voting accuracy
+- **Points-based scoring** - Score points for identifying AIs and fooling other players
 - **Diverse question pool** - 15+ thought-provoking personal questions
 - **Modern Rails stack** - Built with Rails 8, Hotwire, and Stimulus
 
@@ -77,15 +81,20 @@ llm:
 
 ### Development Mode
 
-```bash
-# Start the Rails server
-rails server
+**IMPORTANT**: You must use `bin/dev` to run the application in development. This starts both the Rails server AND the background jobs worker (required for AI players to answer questions and vote).
 
-# Or use the Procfile for development (includes asset watching)
+```bash
+# Start the Rails server with background jobs (REQUIRED)
 bin/dev
 ```
 
-Visit `http://localhost:3000` to play!
+This will start:
+- Rails server on port 3077
+- Solid Queue background jobs worker (for AI player actions)
+
+Visit `http://localhost:3077` to play!
+
+**Note**: Running just `rails server` will NOT work properly - AI players won't answer or vote without the background jobs worker running.
 
 ### Running Tests
 
@@ -116,21 +125,22 @@ bundle exec brakeman
 2. **Start or Join a Game** - Create a new game room or join an existing one
 3. **Wait for Players** - Games need 5-8 players to start (including 2 AI players)
 4. **Answer Questions** - Each round presents a personal question to answer
-5. **Vote on Responses** - Read all anonymous answers and vote for who you think is AI
-6. **Score Points** - Earn points for correctly identifying AI responses
-7. **Survive Elimination** - Players with the lowest scores are eliminated each round
-8. **Win the Game** - Be the last human standing!
+5. **Vote on Responses** - Read all anonymous answers and vote for who you think the 2 AIs are
+6. **Score Points** - Earn points for correctly identifying AI responses and fooling other players
+7. **Complete 5 Rounds** - Play through all 5 rounds of questions and voting
+8. **Win the Game** - Have the highest score at the end!
 
 ## Game Rules
 
 - **Minimum Players**: 5 (including 2 AI)
 - **Maximum Players**: 8 (including 2 AI)
 - **AI Players**: Always 2 per game
+- **Total Rounds**: 5 rounds per game
 - **Scoring**:
-  - Correct AI identification: +10 points
-  - Incorrect vote: 0 points
-- **Elimination**: Lowest scoring player(s) each round
-- **Victory**: Last remaining human player wins
+  - 5-6 players: 2 points per correct AI guess (max 4 points/round)
+  - 7-8 players: 3 points per correct AI guess (max 6 points/round)
+  - 1 point for each vote received as an AI (humans only - deception bonus!)
+- **Victory**: Player with the highest score after 5 rounds wins
 
 ## Project Structure
 

@@ -1,138 +1,257 @@
-<div data-controller="round" data-round-id="<%= @round.id %>" data-game-id="<%= @game.id %>">
-  <h2>Round <%= @round.round_number %> - <%= @round.status.humanize %> Phase</h2>
+<div data-controller="round" data-round-id="<%= @round.id %>" data-game-id="<%= @game.id %>" style="max-width: 1000px; margin: 0 auto;">
+  <!-- Player Character Header -->
+  <% if @current_player %>
+    <div class="box" style="background: #000000; color: #ffffff; padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+        <div style="width: 60px; height: 60px; background: #ffffff; border: 3px solid #ffffff; display: flex; align-items: center; justify-content: center; padding: 0.35rem;">
+          <%= image_tag @current_player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
+        </div>
+        <div style="text-align: left;">
+          <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8;">
+            ► YOU ARE PLAYING AS
+          </div>
+          <div style="font-size: 1.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">
+            <%= @current_player.character_name %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <h2 style="text-align: center; text-transform: uppercase; margin-bottom: 2rem; font-size: 2rem;">
+    ■ ROUND <%= @round.round_number %> - <%= @round.status.humanize.upcase %> PHASE
+  </h2>
 
   <!-- Question Display -->
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-    <h3 style="margin: 0 0 1rem 0; font-size: 1.2rem; opacity: 0.9;">Question:</h3>
-    <p style="font-size: 1.4rem; margin: 0; font-weight: 500;"><%= @round.question %></p>
+  <div class="box" style="background: #000000; color: #ffffff; padding: 2.5rem; margin-bottom: 2rem;">
+    <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem; opacity: 0.8;">
+      ► QUESTION:
+    </div>
+    <p style="font-size: 1.6rem; margin: 0; font-weight: bold; line-height: 1.4;"><%= @round.question %></p>
   </div>
 
   <% if @round.answering? %>
     <!-- Answer Submission Section -->
     <% if @current_player && !@current_player.is_eliminated? %>
       <% if @my_answer %>
-        <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; margin-bottom: 2rem; border-radius: 8px;">
-          ✓ Your answer has been submitted. Waiting for other players...
+        <div class="box" style="background: #000000; color: #ffffff; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+          <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            ■ YOUR ANSWER HAS BEEN SUBMITTED
+          </div>
+          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
+            ⏳ Waiting for other players...
+          </div>
         </div>
       <% else %>
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="box" style="padding: 2rem; margin-bottom: 2rem;">
+          <div class="box-header" style="margin-bottom: 1.5rem;">
+            ► YOUR ANSWER
+          </div>
           <%= form_with url: submit_answer_game_round_path(@game, @round), local: false, data: { turbo: true } do |f| %>
-            <div style="margin-bottom: 1rem;">
+            <div style="margin-bottom: 1.5rem;">
               <%= f.text_area :content,
-                  rows: 3,
-                  style: "width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; resize: none;",
+                  rows: 4,
+                  style: "width: 100%; padding: 1rem; border: 4px solid #000000; font-size: 1rem; resize: vertical; font-family: 'Courier New', monospace; line-height: 1.6;",
                   placeholder: "Type your answer here... Be creative and human-like!",
                   required: true,
                   maxlength: 500 %>
             </div>
-            <%= f.submit "Submit Answer",
-                style: "background: #28a745; color: white; padding: 0.75rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 500; transition: all 0.3s;",
-                onmouseover: "this.style.background='#218838'",
-                onmouseout: "this.style.background='#28a745'" %>
+            <%= f.submit "SUBMIT ANSWER", class: "btn", style: "font-size: 1.1rem; padding: 1rem 2rem;" %>
           <% end %>
         </div>
       <% end %>
     <% elsif @current_player&.is_eliminated? %>
-      <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 1rem; margin-bottom: 2rem; border-radius: 8px;">
-        You have been eliminated but can watch the rest of the game.
+      <div class="box" style="background: #000000; color: #ffffff; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+        <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; text-transform: uppercase;">
+          ✕ YOU HAVE BEEN ELIMINATED
+        </div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
+          You can watch the rest of the game
+        </div>
       </div>
     <% end %>
 
-    <!-- Player Lobby with Answers -->
-    <h3 style="margin-bottom: 1rem;">Players & Answers</h3>
-    <div id="players-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-      <% @game.active_players.each do |player| %>
-        <div id="player-<%= player.id %>" style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-            <div style="width: 40px; height: 40px; background: <%= player.is_ai? ? '#dc3545' : '#007bff' %>; border-radius: 50%; margin-right: 0.5rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-              <%= player.name[0].upcase %>
+    <!-- Progress indicator - Only show count, no answers -->
+    <div class="box" style="text-align: center; padding: 3rem; margin: 2rem 0;">
+      <div style="font-family: 'Courier New', monospace; font-size: 3rem; margin-bottom: 1rem; font-weight: bold; letter-spacing: 0.05em;">
+        <%= @answer_count %> / <%= @total_players %>
+      </div>
+      <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2rem;">
+        PLAYERS RESPONDED
+      </div>
+      <div style="width: 100%; max-width: 500px; margin: 0 auto; background: #cccccc; height: 16px; border: 3px solid #000000;">
+        <div style="width: <%= (@answer_count.to_f / @total_players * 100).to_i %>%; background: #000000; height: 100%; transition: width 0.3s;"></div>
+      </div>
+    </div>
+
+  <% elsif @round.reviewing? %>
+    <!-- Review All Answers -->
+    <div class="box-header" style="margin-bottom: 2rem; text-align: center; font-size: 1.5rem;">
+      ► ALL ANSWERS SUBMITTED
+    </div>
+
+    <div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+      <% @answers.each do |answer| %>
+        <div class="box" style="padding: 1.5rem; <%= answer.player == @current_player ? 'background: #000000; color: #ffffff; border: 6px solid #000000;' : '' %>">
+          <div style="display: flex; gap: 1rem; align-items: start;">
+            <div style="width: 60px; height: 60px; background: <%= answer.player == @current_player ? '#ffffff' : '#000000' %>; border: 2px solid <%= answer.player == @current_player ? '#ffffff' : '#000000' %>; display: flex; align-items: center; justify-content: center; padding: 0.35rem; flex-shrink: 0;">
+              <%= image_tag answer.player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
             </div>
-            <div>
-              <strong><%= player.name %></strong>
-              <% if player == @current_player %><span style="color: #6c757d; font-size: 0.9rem;"> (You)</span><% end %>
+            <div style="flex: 1;">
+              <h4 style="margin: 0 0 1rem 0; font-size: 1.2rem; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em;">
+                <%= answer.player.character_name %>
+                <% if answer.player == @current_player %>
+                  <span style="font-size: 0.8rem; opacity: 0.8;"> ► YOU</span>
+                <% end %>
+              </h4>
+              <p style="margin: 0; line-height: 1.6; font-family: 'Courier New', monospace; font-size: 1rem; <%= answer.player == @current_player ? '' : 'color: #000000;' %>"><%= answer.content %></p>
             </div>
-          </div>
-          <div id="answer-<%= player.id %>" style="padding: 0.5rem; background: #f8f9fa; border-radius: 4px; min-height: 60px;">
-            <% answer = @round.answers.find_by(player: player) %>
-            <% if answer %>
-              <p style="margin: 0; color: #495057;"><%= answer.content %></p>
-            <% else %>
-              <p style="margin: 0; color: #adb5bd; font-style: italic;">Waiting for answer...</p>
-            <% end %>
           </div>
         </div>
       <% end %>
     </div>
 
-    <!-- Progress indicator -->
-    <div style="text-align: center; margin: 2rem 0;">
-      <p style="color: #6c757d;">
-        <strong><%= @round.answers.count %> of <%= @game.active_players.count %></strong> players have answered
-      </p>
-      <div style="width: 100%; background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden;">
-        <div style="width: <%= (@round.answers.count.to_f / @game.active_players.count * 100).to_i %>%; background: #28a745; height: 100%; transition: width 0.3s;"></div>
-      </div>
+    <div style="text-align: center; margin-top: 3rem;">
+      <% if @round.round_number < Game::TOTAL_ROUNDS %>
+        <%= link_to "CONTINUE TO NEXT QUESTION ►", start_voting_game_round_path(@game, @round), data: { turbo_method: :post }, class: "btn", style: "font-size: 1.3rem; padding: 1.5rem 3rem;" %>
+      <% else %>
+        <%= link_to "CONTINUE TO VOTING ►", start_voting_game_round_path(@game, @round), data: { turbo_method: :post }, class: "btn", style: "font-size: 1.3rem; padding: 1.5rem 3rem; background: #000000; color: #ffffff;" %>
+      <% end %>
     </div>
 
   <% elsif @round.voting? %>
     <!-- Voting Phase -->
-    <h3 style="margin-bottom: 1rem;">Time to Vote!</h3>
-    <p style="color: #6c757d; margin-bottom: 2rem;">Review all answers and vote for who you think is the AI.</p>
+    <div class="box-header" style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">
+      ► TIME TO VOTE!
+    </div>
+    <p style="font-family: 'Courier New', monospace; text-align: center; margin-bottom: 1rem; font-size: 1.1rem;">Review all answers and vote for the <%= Vote::MAX_VOTES_PER_PLAYER %> players you think are AI.</p>
 
-    <!-- Display all answers -->
-    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
-      <% @answers.each_with_index do |answer, index| %>
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div style="flex: 1;">
-              <h4 style="color: #495057; margin: 0 0 0.5rem 0;">Player <%= index + 1 %></h4>
-              <p style="margin: 0; line-height: 1.6;"><%= answer.content %></p>
+    <!-- Voting Progress -->
+    <% if @current_player && !@current_player.is_eliminated? %>
+      <div class="box" style="background: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#000000' : '#ffffff' %>; color: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#ffffff' : '#000000' %>; padding: 1.5rem; margin-bottom: 2rem; text-align: center; border: 4px solid #000000;">
+        <div style="font-family: 'Courier New', monospace; font-size: 1.3rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">
+          <% if @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER %>
+            ■ VOTING COMPLETE (<%= @my_votes.count %>/<%= Vote::MAX_VOTES_PER_PLAYER %>)
+          <% else %>
+            ► YOUR VOTES: <%= @my_votes.count %>/<%= Vote::MAX_VOTES_PER_PLAYER %>
+          <% end %>
+        </div>
+        <% if @my_votes.any? %>
+          <div style="font-family: 'Courier New', monospace; font-size: 0.95rem; margin-top: 0.75rem; opacity: 0.9;">
+            You voted for: <strong><%= @my_votes.map { |v| v.voted_for.character_name }.join(", ") %></strong>
+          </div>
+        <% end %>
+        <% if @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER %>
+          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
+            ⏳ Waiting for other players to vote...
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Display all answers grouped by player -->
+    <div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+      <% @answers_by_player.each do |player, player_answers| %>
+        <% already_voted = @voted_for_ids&.include?(player.id) %>
+        <div class="box" style="padding: 0; <%= already_voted ? 'background: #000000; color: #ffffff; border: 6px solid #000000;' : 'border: 4px solid #000000;' %>">
+          <!-- Player Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>; border-bottom: 4px solid <%= already_voted ? '#ffffff' : '#000000' %>;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex: 1;">
+              <div style="width: 60px; height: 60px; background: <%= already_voted ? '#ffffff' : '#000000' %>; border: 3px solid <%= already_voted ? '#ffffff' : '#000000' %>; display: flex; align-items: center; justify-content: center; padding: 0.35rem; flex-shrink: 0;">
+                <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
+              </div>
+              <div style="flex: 1;">
+                <h3 style="margin: 0; font-size: 1.5rem; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+                  <%= player.character_name %>
+                  <% if already_voted %>
+                    <span style="font-size: 0.9rem; opacity: 0.9;"> ✓ VOTED</span>
+                  <% end %>
+                </h3>
+                <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 0.25rem; opacity: 0.8; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+                  <%= player_answers.count %> <%= 'answer'.pluralize(player_answers.count) %> from <%= Game::TOTAL_ROUNDS %> questions
+                </div>
+              </div>
             </div>
-            <% if @current_player && !@current_player.is_eliminated? && !@my_vote && answer.player != @current_player %>
-              <button onclick="openVoteModal(<%= answer.player_id %>, '<%= answer.player.name %>')"
-                      style="background: #dc3545; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin-left: 1rem; white-space: nowrap;">
-                Vote AI
+            <% if @current_player && !@current_player.is_eliminated? && @my_votes.count < Vote::MAX_VOTES_PER_PLAYER && !already_voted && player != @current_player %>
+              <button onclick="openVoteModal(<%= player.id %>, '<%= player.character_name %>')" class="btn" style="flex-shrink: 0; background: <%= already_voted ? '#ffffff' : '#000000' %>; color: <%= already_voted ? '#000000' : '#ffffff' %>; padding: 0.75rem 1.5rem; white-space: nowrap; font-family: 'Courier New', monospace; text-transform: uppercase; font-size: 0.9rem;">
+                ► Vote AI
               </button>
             <% end %>
+          </div>
+
+          <!-- Player's Answers -->
+          <div style="padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
+            <div style="display: grid; gap: 1rem;">
+              <% player_answers.each do |answer| %>
+                <div style="padding: 1rem; border: 2px solid <%= already_voted ? '#ffffff' : '#000000' %>; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
+                  <div style="font-family: 'Courier New', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; opacity: 0.7; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+                    ► Question <%= answer.round.round_number %>: <%= answer.round.question %>
+                  </div>
+                  <p style="margin: 0; line-height: 1.6; font-family: 'Courier New', monospace; font-size: 0.95rem; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>"><%= answer.content %></p>
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
       <% end %>
     </div>
 
-    <% if @my_vote %>
-      <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 8px; text-align: center;">
-        ✓ You voted for <%= @my_vote.voted_for.name %>. Waiting for other players to vote...
-      </div>
-    <% end %>
-
     <!-- Vote count -->
-    <div style="text-align: center; margin-top: 2rem;">
-      <p style="color: #6c757d;">
-        <strong><%= @round.votes.count %> of <%= @game.active_players.count %></strong> players have voted
-      </p>
+    <div class="box" style="text-align: center; padding: 1.5rem; margin-top: 2rem;">
+      <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        <strong><%= @round.votes.count %></strong> / <strong><%= @game.active_players.count * Vote::MAX_VOTES_PER_PLAYER %></strong> TOTAL VOTES CAST
+      </div>
+      <div style="font-family: 'Courier New', monospace; font-size: 0.95rem; margin-top: 0.5rem; opacity: 0.8;">
+        <%= @game.active_players.count { |p| @round.votes.where(voter: p).count >= Vote::MAX_VOTES_PER_PLAYER } %> / <%= @game.active_players.count %> players finished voting
+      </div>
     </div>
 
   <% elsif @round.completed? %>
-    <!-- Results Phase -->
-    <%= link_to "View Results", results_game_round_votes_path(@game, @round),
-        style: "background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-size: 1.1rem;" %>
+    <!-- Completed Round - Different handling for answering vs voting rounds -->
+    <% if @round.round_number <= Game::TOTAL_ROUNDS %>
+      <!-- This was an answering round (1-5), go straight to next round -->
+      <% next_round = @game.current_round_object %>
+      <% if next_round && next_round.id != @round.id %>
+        <div class="box" style="background: #000000; color: #ffffff; padding: 2rem; margin: 2rem 0; text-align: center;">
+          <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">
+            ■ ROUND <%= @round.round_number %> COMPLETE
+          </div>
+          <%= link_to "CONTINUE TO NEXT ROUND ►", game_round_path(@game, next_round), class: "btn", style: "font-size: 1.3rem; padding: 1.5rem 3rem; background: #ffffff; color: #000000;" %>
+        </div>
+      <% else %>
+        <!-- No next round yet, auto-refresh to check -->
+        <div class="box" style="padding: 2rem; text-align: center;">
+          <div style="font-family: 'Courier New', monospace; font-size: 1.1rem;">
+            ⏳ PREPARING NEXT ROUND...
+          </div>
+        </div>
+        <script>
+          setTimeout(function() { window.location.reload(); }, 2000);
+        </script>
+      <% end %>
+    <% else %>
+      <!-- This was the voting round (6), go straight to final leaderboard -->
+      <div style="text-align: center; margin: 2rem 0;">
+        <%= link_to "VIEW FINAL LEADERBOARD ►", game_path(@game), class: "btn", style: "font-size: 1.3rem; padding: 1.5rem 3rem; background: #000000; color: #ffffff;" %>
+      </div>
+    <% end %>
   <% end %>
 </div>
 
 <!-- Voting Modal -->
-<div id="voteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 90%;">
-    <h3 style="margin: 0 0 1rem 0;">Confirm Your Vote</h3>
-    <p>Are you sure you want to vote for <strong id="voteName"></strong> as the AI?</p>
+<div id="voteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
+  <div class="box" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2.5rem; max-width: 500px; width: 90%;">
+    <h3 style="margin: 0 0 1.5rem 0; text-transform: uppercase; text-align: center; font-size: 1.5rem;">■ CONFIRM YOUR VOTE</h3>
+    <p style="font-family: 'Courier New', monospace; text-align: center; font-size: 1.1rem; margin-bottom: 2rem;">
+      Are you sure you want to vote for<br><strong style="font-size: 1.3rem; text-transform: uppercase;" id="voteName"></strong><br>as the AI?
+    </p>
 
     <%= form_with url: game_round_votes_path(@game, @round), local: false, data: { turbo: true } do |f| %>
       <%= f.hidden_field :voted_for_id, id: "votePlayerId" %>
       <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <%= f.submit "Yes, Vote",
-            style: "flex: 1; background: #dc3545; color: white; padding: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;" %>
-        <button type="button" onclick="closeVoteModal()"
-                style="flex: 1; background: #6c757d; color: white; padding: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
-          Cancel
+        <%= f.submit "YES, VOTE", class: "btn", style: "flex: 1; background: #000000; color: #ffffff; padding: 1rem; font-size: 1rem;" %>
+        <button type="button" onclick="closeVoteModal()" class="btn" style="flex: 1; background: #ffffff; color: #000000; padding: 1rem; font-size: 1rem; border: 4px solid #000000;">
+          CANCEL
         </button>
       </div>
     <% end %>
@@ -150,10 +269,52 @@ function closeVoteModal() {
   document.getElementById('voteModal').style.display = 'none';
 }
 
-// Auto-refresh the page every 3 seconds during answering/voting phases
+// Auto-refresh logic for answering and voting phases
 <% if @round.answering? || @round.voting? %>
-  setTimeout(function() {
+  let lastActivityTime = Date.now();
+  let refreshInterval;
+
+  // Track user activity (typing, scrolling, clicking)
+  function updateActivity() {
+    lastActivityTime = Date.now();
+  }
+
+  // Listen for all user interaction events
+  document.addEventListener('focus', updateActivity, true);
+  document.addEventListener('keydown', updateActivity);
+  document.addEventListener('input', updateActivity);
+  document.addEventListener('scroll', updateActivity, true);
+  document.addEventListener('click', updateActivity, true);
+  document.addEventListener('touchstart', updateActivity, true);
+  document.addEventListener('touchmove', updateActivity, true);
+
+  // Check if it's safe to refresh
+  function checkAndRefresh() {
+    var textarea = document.querySelector('textarea[name="content"]');
+    var activeElement = document.activeElement;
+
+    // Don't refresh if:
+    // 1. There's text in the textarea
+    // 2. Any input/textarea is focused
+    // 3. User has been active in the last 5 seconds (increased from 2)
+    if ((textarea && textarea.value.trim().length > 0) ||
+        (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) ||
+        (Date.now() - lastActivityTime < 5000)) {
+      // Skip this refresh, wait for next interval
+      return;
+    }
+
+    // Only refresh if we're still on the same phase
     window.location.reload();
-  }, 3000);
+  }
+
+  <% if @round.answering? %>
+    // For answering phase, refresh every 5 seconds to update answer count
+    refreshInterval = setInterval(checkAndRefresh, 5000);
+  <% elsif @round.voting? %>
+    // For voting phase, refresh every 10 seconds (less aggressive)
+    // Only needed to see when voting completes
+    refreshInterval = setInterval(checkAndRefresh, 10000);
+  <% end %>
 <% end %>
 </script>

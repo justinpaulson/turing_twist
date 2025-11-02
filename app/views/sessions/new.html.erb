@@ -1,11 +1,38 @@
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+  <div class="box" style="width: 100%; max-width: 500px;">
+    <h2 style="text-align: center; margin-bottom: 0.5rem;">SIGN IN</h2>
+    <p style="text-align: center; margin-bottom: 2rem; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+      Enter your credentials to continue
+    </p>
 
-<%= form_with url: session_path do |form| %>
-  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %><br>
-  <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %><br>
-  <%= form.submit "Sign in" %>
-<% end %>
-<br>
+    <%= form_with url: session_path, html: { style: "display: flex; flex-direction: column; gap: 2rem;" } do |form| %>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <%= form.label :email_address, "◆ Email Address" %>
+        <%= form.email_field :email_address,
+            required: true,
+            autofocus: true,
+            autocomplete: "username",
+            placeholder: "player@turingtwist.com",
+            value: params[:email_address] %>
+      </div>
 
-<%= link_to "Forgot password?", new_password_path %>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <%= form.label :password, "◆ Password" %>
+        <%= form.password_field :password,
+            required: true,
+            autocomplete: "current-password",
+            placeholder: "Enter secure password",
+            maxlength: 72 %>
+      </div>
+
+      <hr class="separator">
+
+      <%= form.submit "[ START GAME ]" %>
+    <% end %>
+
+    <div style="margin-top: 1.5rem; text-align: center;">
+      <%= link_to "⚙ Forgot password?", new_password_path %>
+    </div>
+
+  </div>
+</div>

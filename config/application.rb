@@ -29,8 +29,5 @@ module TuringTwist
 
     # Use Solid Cache
     config.cache_store = :solid_cache_store
-
-    # Use Solid Cable for Action Cable
-    config.action_cable.adapter = :solid_cable
   end
 end

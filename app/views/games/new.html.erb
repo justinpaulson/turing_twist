@@ -1,20 +1,63 @@
-<h2>Create New Game</h2>
+<h2>CREATE NEW GAME</h2>
 
-<div style="background: #e9ecef; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-  <h3>How to Play Turing Twist</h3>
-  <ol>
+<div class="box">
+  <div class="box-header">
+    ► HOW TO PLAY TURING TWIST
+  </div>
+  <ol style="font-family: 'Courier New', monospace; line-height: 2; margin-left: 1.5rem;">
     <li>5-8 players join the game (2 will always be AI)</li>
-    <li>Each round, everyone answers a personal question</li>
-    <li>Read all answers and vote for who you think is the AI</li>
-    <li>The player with the most votes is eliminated</li>
-    <li>Continue until all AIs are found (humans win) or AIs survive (AIs win)</li>
+    <li>Play 5 rounds - each round, everyone answers a personal question</li>
+    <li>Read all answers and vote for who you think the 2 AIs are</li>
+    <li>Score points for correct AI guesses and by fooling other players into voting for you</li>
+    <li>After 5 rounds, the player with the highest score wins!</li>
   </ol>
 </div>
 
-<%= form_with model: @game, local: true do |f| %>
-  <p>Click the button below to create a new game. The game will start automatically when enough players join.</p>
+<div class="box">
+  <%= form_with model: @game, local: true do |f| %>
+    <p style="font-family: 'Courier New', monospace; margin-bottom: 2rem; font-size: 1.05rem;">
+      Click the button below to create a new game. The game will start automatically when enough players join.
+    </p>
 
-  <%= f.submit "Create Game", style: "background: #007bff; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1rem;" %>
-<% end %>
+    <div style="margin-bottom: 2rem; padding: 1.5rem; border: 3px solid #000000; background: #ffffff;">
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <input type="checkbox" id="password_toggle" style="width: 20px; height: 20px; cursor: pointer;">
+        <label for="password_toggle" style="font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; cursor: pointer; margin: 0;">
+          ■ Make Game Private (Password Protected)
+        </label>
+      </div>
+      <div id="password_field" style="display: none;">
+        <%= f.label :password, "Password:", style: "display: block; font-family: 'Courier New', monospace; font-weight: bold; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.9rem;" %>
+        <%= f.text_field :password, placeholder: "Enter password...", style: "width: 100%; padding: 0.75rem; border: 3px solid #000000; font-family: 'Courier New', monospace; font-size: 1rem;", id: "password_input" %>
+        <p style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin: 0.5rem 0 0 0; opacity: 0.7;">
+          Players will need this password to join your game.
+        </p>
+      </div>
+    </div>
 
-<%= link_to "Back to Games", games_path, style: "display: inline-block; margin-top: 1rem; color: #007bff;" %>
+    <%= f.submit "CREATE GAME", class: "btn", style: "font-size: 1.1rem;" %>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('password_toggle');
+    const passwordField = document.getElementById('password_field');
+    const passwordInput = document.getElementById('password_input');
+
+    if (toggle && passwordField && passwordInput) {
+      toggle.addEventListener('change', function() {
+        if (this.checked) {
+          passwordField.style.display = 'block';
+          passwordInput.required = true;
+        } else {
+          passwordField.style.display = 'none';
+          passwordInput.required = false;
+          passwordInput.value = '';
+        }
+      });
+    }
+  });
+</script>
+
+<%= link_to "← BACK TO GAMES", games_path, class: "btn" %>

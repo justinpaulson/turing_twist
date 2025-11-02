@@ -11,9 +11,8 @@ class CollectAiAnswersJob < ApplicationJob
 
     # Check if all players have answered
     if round.all_players_answered?
-      # Move to voting phase
-      round.update!(status: :voting)
-      CollectAiVotesJob.perform_later(round)
+      # Move to reviewing phase so all players can see answers
+      round.update!(status: :reviewing)
     end
   end
 end

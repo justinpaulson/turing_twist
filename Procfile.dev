@@ -1,2 +1,2 @@
-web: bin/rails server -p 3077
+web: bin/rails server -b 0.0.0.0 -p 3077
 jobs: bin/jobs

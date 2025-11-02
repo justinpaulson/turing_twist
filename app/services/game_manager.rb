@@ -23,9 +23,15 @@ class GameManager
       game.increment!(:round_count)
       game.increment!(:current_round)
 
+      # Check if we've completed all answering rounds
+      if game.current_round > Game::TOTAL_ROUNDS
+        # Game should be completed now
+        return
+      end
+
       round = game.rounds.create!(
         round_number: game.current_round,
-        question: Round.generate_question,
+        question: Round.generate_question(game),
         status: :answering,
         started_at: Time.current
       )
@@ -37,25 +43,37 @@ class GameManager
     end
   end
 
-  def process_voting_results!(round)
-    votes = round.votes.group(:voted_for_id).count
+  def create_voting_round!
+    # Create a final voting round after all 5 answering rounds
+    game.transaction do
+      game.increment!(:round_count)
+      game.increment!(:current_round)
 
-    if votes.any?
-      # Find player with most votes
-      most_voted_player_id = votes.max_by { |_, count| count }.first
-      most_voted_player = Player.find(most_voted_player_id)
+      round = game.rounds.create!(
+        round_number: Game::TOTAL_ROUNDS + 1,
+        question: "Vote for the 2 players you think are AI",
+        status: :voting,
+        started_at: Time.current
+      )
 
-      # Eliminate the player
-      most_voted_player.update!(is_eliminated: true)
+      # Generate AI votes immediately (inline) to ensure they happen
+      # even if background jobs aren't running
+      game.active_ai_players.each do |ai_player|
+        AiPlayerService.new(ai_player, round).generate_vote
+      end
 
-      # Check win conditions
-      check_win_conditions!
+      round
     end
+  end
+
+  def process_voting_results!(round)
+    # Calculate scores based on votes
+    calculate_scores!(round)
 
     round.update!(status: :completed, ended_at: Time.current)
 
-    # Start next round if game continues
-    create_next_round! unless game.completed?
+    # Game is complete after voting
+    game.update!(status: :completed)
   end
 
   private
@@ -63,7 +81,7 @@ class GameManager
   def create_first_round!
     game.rounds.create!(
       round_number: 1,
-      question: Round.generate_question,
+      question: Round.generate_question(game),
       status: :answering,
       started_at: Time.current
     ).tap do |round|
@@ -71,20 +89,25 @@ class GameManager
     end
   end
 
-  def check_win_conditions!
-    active_players = game.active_players
-    ai_count = active_players.where(is_ai: true).count
-    human_count = active_players.where(is_ai: false).count
+  def calculate_scores!(round)
+    points_per_correct = game.points_per_correct_guess
 
-    if ai_count == 0
-      # Humans win - all AIs eliminated
-      game.update!(status: :completed)
-    elsif human_count <= ai_count
-      # AIs win - they're in majority or tied
-      game.update!(status: :completed)
-    elsif active_players.count <= 2
-      # Game ends when only 2 players left
-      game.update!(status: :completed)
+    game.players.each do |player|
+      score = 0
+
+      # Points for correct AI guesses
+      player_votes = round.votes.where(voter: player)
+      player_votes.each do |vote|
+        score += points_per_correct if vote.voted_for.is_ai?
+      end
+
+      # Points for deceiving others (being voted as AI when you're human)
+      if !player.is_ai?
+        votes_received = round.votes.where(voted_for: player).count
+        score += votes_received
+      end
+
+      player.update!(score: score)
     end
   end
 end

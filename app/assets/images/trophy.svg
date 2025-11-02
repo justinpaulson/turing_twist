@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="white"/>
+  <!-- Trophy cup -->
+  <rect x="20" y="16" width="24" height="4" fill="black"/>
+  <rect x="18" y="20" width="28" height="16" fill="black"/>
+  <rect x="20" y="36" width="24" height="4" fill="black"/>
+  <!-- Trophy handles -->
+  <rect x="12" y="20" width="4" height="12" fill="black"/>
+  <rect x="48" y="20" width="4" height="12" fill="black"/>
+  <!-- Trophy base -->
+  <rect x="24" y="40" width="16" height="4" fill="black"/>
+  <rect x="20" y="44" width="24" height="4" fill="black"/>
+  <rect x="18" y="48" width="28" height="4" fill="black"/>
+  <!-- Star on cup -->
+  <rect x="30" y="24" width="4" height="4" fill="white"/>
+  <rect x="26" y="28" width="12" height="4" fill="white"/>
+  <rect x="30" y="32" width="4" height="4" fill="white"/>
+</svg>

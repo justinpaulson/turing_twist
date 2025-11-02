@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <rect width="24" height="24" fill="none"/>
+  <!-- Lock shackle - top horizontal -->
+  <rect x="8" y="4" width="8" height="2" fill="black"/>
+  <!-- Lock shackle - left vertical -->
+  <rect x="8" y="6" width="2" height="6" fill="black"/>
+  <!-- Lock shackle - right vertical -->
+  <rect x="14" y="6" width="2" height="6" fill="black"/>
+  <!-- Lock body -->
+  <rect x="6" y="10" width="12" height="10" fill="black"/>
+  <!-- Keyhole -->
+  <rect x="10" y="14" width="4" height="4" fill="white"/>
+</svg>

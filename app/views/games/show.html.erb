@@ -1,32 +1,229 @@
-<h2>Game #<%= @game.id %></h2>
-
-<div style="background: #f8f9fa; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
-  <p>
-    <strong>Status:</strong> <%= @game.status.humanize %><br>
-    <strong>Round:</strong> <%= @game.current_round %> / <%= @game.round_count %><br>
-    <strong>Players:</strong> <%= @game.players.count %> (<%= @game.active_players.count %> active)
-  </p>
-</div>
+<%= turbo_stream_from @game %>
 
 <% if @game.waiting? %>
-  <h3>Waiting Room</h3>
-  <p>Waiting for more players to join...</p>
-  <p><strong>Minimum players needed:</strong> <%= Game::MIN_PLAYERS %></p>
-  <p><strong>Current players:</strong> <%= @game.players.count %></p>
+  <div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 3rem;">WAITING FOR PLAYERS...</h2>
 
-  <h4>Players in game:</h4>
-  <ul>
-    <% @game.players.each do |player| %>
-      <li>
-        <%= player.name %>
-        <% if player == @current_player %>(You)<% end %>
-      </li>
+    <!-- Character Assignment Display -->
+    <% if @current_player %>
+      <div class="box" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
+        <div style="display: flex; align-items: stretch; min-height: 300px;">
+          <!-- Character Avatar (Left) -->
+          <div style="flex: 0 0 300px; background: #000000; display: flex; align-items: center; justify-content: center; padding: 2rem; border-right: 4px solid #000000;">
+            <%= image_tag @current_player.character_avatar_path, style: "width: 100%; height: auto; max-width: 250px; display: block;" %>
+          </div>
+
+          <!-- Character Name (Right) -->
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; background: #ffffff;">
+            <div style="font-family: 'Courier New', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 1rem; color: #333333;">
+              ► YOU ARE
+            </div>
+            <div style="font-size: 3.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1; text-align: center; margin-bottom: 2rem;">
+              <%= @current_player.character_name %>
+            </div>
+            <div class="box" style="background: #000000; color: #ffffff; text-align: center; padding: 1.5rem; width: 100%;">
+              <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">
+                ■ IN THIS GAME
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="box" style="border: 4px dashed #333333; text-align: center; padding: 2rem; margin-bottom: 2rem;">
+        <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          ▶ YOU ARE VIEWING AS A SPECTATOR
+        </div>
+        <% if @game.private? && params[:password].present? %>
+          <%= form_with url: join_game_path(@game), method: :post, local: true, style: "display: inline;" do |f| %>
+            <%= f.hidden_field :password, value: params[:password] %>
+            <%= f.submit "JOIN THIS GAME", class: "btn", style: "font-size: 1.3rem; padding: 1rem 3rem;" %>
+          <% end %>
+        <% else %>
+          <%= link_to "JOIN THIS GAME", join_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "font-size: 1.3rem; padding: 1rem 3rem;" %>
+        <% end %>
+      </div>
     <% end %>
-  </ul>
 
-  <% if @game.can_start? && @current_player %>
-    <%= link_to "Start Game", start_game_path(@game), data: { turbo_method: :post }, style: "background: #28a745; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;" %>
-  <% end %>
+    <!-- Player Count -->
+    <div class="box" style="text-align: center; padding: 3rem;">
+      <div style="font-family: 'Courier New', monospace; font-size: 5rem; font-weight: bold; margin-bottom: 1rem; letter-spacing: 0.1em;">
+        <%= @game.players.count %> / <%= Game::MAX_PLAYERS %>
+      </div>
+      <div style="font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;">
+        PLAYERS JOINED
+      </div>
+      <hr class="separator">
+      <% if @game.players.count < Game::MIN_PLAYERS %>
+        <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; margin-top: 1.5rem;">
+          ▶ NEED <%= Game::MIN_PLAYERS - @game.players.count %> MORE TO START
+        </div>
+      <% else %>
+        <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; margin-top: 1.5rem;">
+          ■ READY TO START!
+        </div>
+      <% end %>
+    </div>
+
+    <!-- How to Play -->
+    <div class="box">
+      <div class="box-header">
+        ► HOW TO PLAY
+      </div>
+
+      <div style="display: grid; gap: 2rem;">
+        <!-- Step 1 -->
+        <div style="display: flex; gap: 1.5rem; align-items: start;">
+          <div style="background: #000000; color: #ffffff; border: 4px solid #000000; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; flex-shrink: 0;">1</div>
+          <div style="flex: 1;">
+            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase;">Answer 5 Questions</h4>
+            <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 1rem;">Everyone (including <%= Game::AI_PLAYERS_COUNT %> hidden AI players) answers 5 personal questions. Try to sound human, or try to fool others into thinking you are AI!</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="display: flex; gap: 1.5rem; align-items: start;">
+          <div style="background: #000000; color: #ffffff; border: 4px solid #000000; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; flex-shrink: 0;">2</div>
+          <div style="flex: 1;">
+            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase;">Vote for 2 AIs</h4>
+            <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 1rem;">After all questions, review everyone's answers and vote for who you think the 2 AI players are.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="display: flex; gap: 1.5rem; align-items: start;">
+          <div style="background: #000000; color: #ffffff; border: 4px solid #000000; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; flex-shrink: 0;">3</div>
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <h4 style="margin: 0; font-size: 1.3rem; text-transform: uppercase;">Score Points</h4>
+              <div style="position: relative; display: inline-block;">
+                <span class="info-tooltip-trigger" style="cursor: help; background: #000000; color: #ffffff; border: 2px solid #000000; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: bold;">i</span>
+                <div class="info-tooltip-content" style="display: none; position: absolute; left: 30px; top: -10px; background: #000000; color: #ffffff; border: 3px solid #000000; padding: 1rem; min-width: 300px; z-index: 1000; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6;">
+                  <div style="margin-bottom: 0.75rem;">
+                    <strong style="text-transform: uppercase;">5-6 PLAYERS:</strong><br>
+                    • Correct AI guess: <strong>2 points</strong> (4 points total possible)<br>
+                    • Each player who votes for you as AI: <strong>1 point</strong>
+                  </div>
+                  <div>
+                    <strong style="text-transform: uppercase;">7-8 PLAYERS:</strong><br>
+                    • Correct AI guess: <strong>3 points</strong> (6 points total possible)<br>
+                    • Each player who votes for you as AI: <strong>1 point</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 1rem;">Earn points for correctly identifying AIs and by fooling other players into voting for you.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Win Conditions -->
+    <div class="box">
+      <div class="box-header">
+        ★ HOW TO WIN
+      </div>
+      <div style="text-align: center; padding: 2rem;">
+        <div style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+          <%= image_tag "trophy.svg", style: "width: 120px; height: 120px; border: 4px solid #000000;" %>
+        </div>
+        <div style="font-weight: bold; font-size: 1.5rem; margin-bottom: 0.5rem; text-transform: uppercase;">Highest Score Wins!</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; line-height: 1.8;">
+          After 5 rounds of questions and voting,<br>
+          the player with the most points is the winner!
+        </div>
+      </div>
+    </div>
+
+    <!-- Host Controls -->
+    <% if @current_player&.is_host %>
+      <div class="box" style="background: #000000; color: #ffffff; padding: 2rem; margin-bottom: 2rem;">
+        <div class="box-header" style="background: #ffffff; color: #000000; margin: -2rem -2rem 1.5rem -2rem; padding: 1rem 2rem;">
+          ★ HOST CONTROLS
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+          <input type="text" id="game-link" value="<%= @game.private? ? game_url(@game, password: @game.password) : game_url(@game) %>" readonly style="flex: 1; padding: 0.75rem; border: 3px solid #ffffff; background: #ffffff; color: #000000; font-family: 'Courier New', monospace; font-size: 1rem;">
+          <button id="copy-link-btn" class="btn" style="white-space: nowrap; background: #ffffff; color: #000000; border: 3px solid #ffffff;">
+            COPY LINK
+          </button>
+        </div>
+
+        <% if @game.private? %>
+          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; padding: 1rem; background: rgba(255,255,255,0.1); border: 2px solid #ffffff; display: flex; align-items: center; gap: 0.75rem;">
+            <%= image_tag "lock.svg", style: "width: 24px; height: 24px; flex-shrink: 0; filter: invert(1);" %>
+            <div>
+              <strong>PRIVATE GAME</strong><br>
+              Password: <strong><%= @game.password %></strong>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Action Buttons -->
+    <div style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <% if @game.can_start? && @current_player&.is_host %>
+        <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "font-size: 1.3rem; padding: 1rem 3rem;" %>
+      <% elsif @current_player && !@current_player.is_host %>
+        <div class="box" style="padding: 2rem; font-family: 'Courier New', monospace; font-size: 1.1rem;">
+          ⏳ WAITING FOR THE HOST TO START THE GAME...
+        </div>
+      <% end %>
+
+      <%= link_to "← BACK TO GAMES", games_path, class: "btn" %>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Tooltip functionality
+        const triggers = document.querySelectorAll('.info-tooltip-trigger');
+
+        triggers.forEach(trigger => {
+          const tooltip = trigger.nextElementSibling;
+
+          trigger.addEventListener('mouseenter', function() {
+            tooltip.style.display = 'block';
+          });
+
+          trigger.addEventListener('mouseleave', function() {
+            tooltip.style.display = 'none';
+          });
+
+          trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            tooltip.style.display = tooltip.style.display === 'none' ? 'block' : 'none';
+          });
+        });
+
+        // Copy link functionality
+        const copyBtn = document.getElementById('copy-link-btn');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', function() {
+            const linkInput = document.getElementById('game-link');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(linkInput.value).then(function() {
+              // Change button text temporarily
+              const originalText = copyBtn.textContent;
+              copyBtn.textContent = '✓ COPIED!';
+              copyBtn.style.background = '#000000';
+              copyBtn.style.color = '#ffffff';
+
+              setTimeout(function() {
+                copyBtn.textContent = originalText;
+                copyBtn.style.background = '#ffffff';
+                copyBtn.style.color = '#000000';
+              }, 2000);
+            }).catch(function(err) {
+              console.error('Failed to copy: ', err);
+            });
+          });
+        }
+      });
+    </script>
+  </div>
 
 <% elsif @game.active? && @current_round %>
 
@@ -81,34 +278,151 @@
   <% end %>
 
 <% elsif @game.completed? %>
-  <h3>Game Over!</h3>
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 3rem; text-transform: uppercase; font-size: 3rem;">GAME OVER!</h2>
 
-  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
-    <% remaining_players = @game.active_players %>
-    <% ai_count = remaining_players.where(is_ai: true).count %>
-    <% human_count = remaining_players.where(is_ai: false).count %>
+    <!-- Winner/Final Leaderboard -->
+    <div class="box" style="background: #000000; color: #ffffff; padding: 2rem; margin-bottom: 2rem;">
+      <div style="font-family: 'Courier New', monospace; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 2rem; text-align: center;">
+        ★ FINAL LEADERBOARD ★
+      </div>
 
-    <% if ai_count == 0 %>
-      <h4 style="color: #28a745;">Humans Win!</h4>
-      <p>All AI players have been eliminated!</p>
-    <% elsif ai_count >= human_count %>
-      <h4 style="color: #dc3545;">AIs Win!</h4>
-      <p>The AIs survived and are now in the majority!</p>
-    <% else %>
-      <h4>Game Complete</h4>
-    <% end %>
+      <!-- Column Headers -->
+      <div style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 3px solid #ffffff; margin-bottom: 1rem;">
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">RANK</div>
+        <div></div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">PLAYER</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">AIS FOUND</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">VOTES RCV'D</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">SCORE</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">STATUS</div>
+      </div>
 
-    <h4>Final Players:</h4>
-    <ul>
-      <% @game.players.each do |player| %>
-        <li>
-          <%= player.name %> -
-          <strong><%= player.is_ai? ? "AI" : "Human" %></strong>
-          <% if player.is_eliminated? %>(Eliminated)<% end %>
-        </li>
-      <% end %>
-    </ul>
+      <!-- Player Rows -->
+      <div style="display: grid; gap: 0.5rem;">
+        <% @game.players.order(score: :desc).each_with_index do |player, index| %>
+          <% stats = @player_stats[player.id] || {} %>
+          <div class="box" style="background: <%= index == 0 ? '#FFD700' : '#ffffff' %>; color: #000000; padding: 1.5rem; border: 4px solid <%= index == 0 ? '#FFD700' : '#cccccc' %>;">
+            <div style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; align-items: center;">
+
+              <!-- Rank -->
+              <div style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace;">
+                <%= index == 0 ? '🏆' : "#{index + 1}" %>
+              </div>
+
+              <!-- Avatar -->
+              <div style="width: 70px; height: 70px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.4rem;">
+                <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
+              </div>
+
+              <!-- Player Name -->
+              <div>
+                <div style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                  <%= player.character_name %>
+                </div>
+                <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
+                  <%= player.is_ai? ? "■ AI PLAYER" : "■ HUMAN PLAYER" %>
+                </div>
+              </div>
+
+              <!-- AIs Found (X/2) -->
+              <div style="text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                  <%= stats[:correct_votes] || 0 %>/2
+                </div>
+                <div style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  +<%= stats[:points_from_guesses] || 0 %> pts
+                </div>
+              </div>
+
+              <!-- Votes Received -->
+              <div style="text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                  <%= stats[:votes_received] || 0 %>
+                </div>
+                <div style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  <%= player.is_ai? ? "—" : "+#{stats[:points_from_deception] || 0} pts" %>
+                </div>
+              </div>
+
+              <!-- Total Score -->
+              <div style="text-align: center; background: #000000; color: <%= index == 0 ? '#FFD700' : '#ffffff' %>; padding: 1rem; border: 3px solid #000000;">
+                <div style="font-size: 2.5rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                  <%= player.score || 0 %>
+                </div>
+                <div style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; margin-top: 0.25rem;">
+                  POINTS
+                </div>
+              </div>
+
+              <!-- Status Badge -->
+              <div style="text-align: center;">
+                <% if index == 0 %>
+                  <div style="background: #FFD700; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                    WINNER
+                  </div>
+                <% elsif player.is_ai? %>
+                  <div style="background: #000000; color: #ffffff; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                    AI
+                  </div>
+                <% else %>
+                  <div style="background: #ffffff; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                    HUMAN
+                  </div>
+                <% end %>
+              </div>
+
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Scoring Legend -->
+      <div style="margin-top: 2rem; padding: 1.5rem; border: 3px solid #ffffff; background: rgba(255,255,255,0.1);">
+        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; opacity: 0.8;">
+          ► SCORING BREAKDOWN:
+        </div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8;">
+          • Each correct AI identification: <strong>+<%= @game.points_per_correct_guess %> points</strong> (max <%= @game.max_points_from_guesses %> points)<br>
+          • Each vote received as AI (humans only): <strong>+1 point</strong> (fooled other players!)<br>
+          • AIs Found: Shows how many of the 2 AI players you correctly identified
+        </div>
+      </div>
+    </div>
+
+    <!-- The Reveal: All Characters -->
+    <div class="box" style="padding: 2rem; margin-bottom: 2rem;">
+      <div class="box-header" style="text-align: center; margin-bottom: 2rem;">
+        ► THE REVEAL ◄
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <% @game.players.where(is_ai: false).each do |player| %>
+          <div class="box" style="background: #ffffff; padding: 1.5rem; text-align: center;">
+            <div style="width: 100px; height: 100px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.5rem; margin: 0 auto 1rem;">
+              <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
+            </div>
+            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase; font-family: 'Courier New', monospace;"><%= player.character_name %></h4>
+            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; padding: 0.5rem; background: #000000; color: #ffffff; font-weight: bold; text-transform: uppercase;">
+              ■ HUMAN
+            </div>
+          </div>
+        <% end %>
+
+        <% @game.players.where(is_ai: true).each do |player| %>
+          <div class="box" style="background: #000000; color: #ffffff; padding: 1.5rem; text-align: center;">
+            <div style="width: 100px; height: 100px; background: #ffffff; border: 3px solid #ffffff; display: flex; align-items: center; justify-content: center; padding: 0.5rem; margin: 0 auto 1rem;">
+              <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
+            </div>
+            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase; font-family: 'Courier New', monospace;"><%= player.character_name %></h4>
+            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; padding: 0.5rem; background: #ffffff; color: #000000; font-weight: bold; text-transform: uppercase; border: 2px solid #ffffff;">
+              ■ AI
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%= link_to "← BACK TO GAMES", games_path, class: "btn", style: "display: block; width: fit-content; margin: 2rem auto 0;" %>
   </div>
-
-  <%= link_to "Back to Games", games_path, style: "background: #6c757d; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 1rem;" %>
 <% end %>
