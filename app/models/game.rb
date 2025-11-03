@@ -82,7 +82,8 @@ class Game < ApplicationRecord
   end
 
   def all_rounds_complete?
-    rounds.count >= TOTAL_ROUNDS && rounds.all?(&:completed?)
+    answering_rounds = rounds.where("round_number <= ?", TOTAL_ROUNDS)
+    answering_rounds.count >= TOTAL_ROUNDS && answering_rounds.all?(&:completed?)
   end
 
   def voting_complete?
