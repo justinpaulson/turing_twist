@@ -1,5 +1,5 @@
 class Player < ApplicationRecord
-  belongs_to :game
+  belongs_to :game, touch: true
   belongs_to :user, optional: true
   has_many :answers, dependent: :destroy
   has_many :votes_cast, class_name: "Vote", foreign_key: "voter_id", dependent: :destroy
