@@ -107,6 +107,12 @@ class GamesController < ApplicationController
       return
     end
 
+    # If voting is complete, redirect to final results
+    if @game.voting_complete?
+      redirect_to @game
+      return
+    end
+
     # Get all answers from all rounds to display
     answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
     all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
