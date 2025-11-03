@@ -2,6 +2,8 @@
 
 A social deduction party game where players try to identify AI players among human participants. Inspired by the Turing Test, players answer personal questions and vote on who they think is human or AI.
 
+**🎮 Play now at: [turing.justinpaulson.com](https://turing.justinpaulson.com)**
+
 ## Design Theme
 
 Turing Twist features a **black and white newspaper style** with **old school Nintendo graphics** aesthetic. The visual design combines the classic look of newspaper print with retro 8-bit gaming elements, creating a unique vintage computing experience. See `claude.md` for detailed design system documentation.
