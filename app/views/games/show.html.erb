@@ -8,14 +8,6 @@
 
       <% if @game.can_start? && @current_player&.is_host %>
         <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "display: flex; align-items: center; justify-content: center; font-size: 1rem; white-space: nowrap;" %>
-      <% elsif @current_player && !@current_player.is_host %>
-        <div class="box" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: 'Courier New', monospace; font-size: 1rem; white-space: nowrap;">
-          <%= image_tag "hourglass.svg", style: "width: 16px; height: 16px;" %>
-          WAITING...
-        </div>
-      <% else %>
-        <!-- Spacer for alignment when neither condition is met -->
-        <div style="min-width: 120px;"></div>
       <% end %>
     </div>
 
@@ -65,12 +57,21 @@
       </div>
       <hr class="separator">
       <% if @game.players.count < Game::MIN_PLAYERS %>
-        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem;">
-          ▶ NEED <%= Game::MIN_PLAYERS - @game.players.count %> MORE TO START
+        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <%= image_tag "hourglass.svg", style: "width: 20px; height: 20px;" %>
+          WAITING FOR PLAYERS
         </div>
-      <% else %>
+        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.8rem, 2vw, 1rem); margin-top: 0.75rem; opacity: 0.7;">
+          ▶ NEED <%= Game::MIN_PLAYERS - @game.players.count %> MORE
+        </div>
+      <% elsif @current_player&.is_host %>
         <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem;">
           ■ READY TO START!
+        </div>
+      <% else %>
+        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <%= image_tag "hourglass.svg", style: "width: 20px; height: 20px;" %>
+          WAITING FOR HOST TO START
         </div>
       <% end %>
     </div>
