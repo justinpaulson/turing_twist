@@ -4,7 +4,7 @@
   @media (max-width: 768px) {
     /* Final Leaderboard - Compact horizontal rows on mobile */
     .leaderboard-header {
-      grid-template-columns: 30px 40px 1fr 45px 45px 55px 40px !important;
+      grid-template-columns: 30px 40px 1fr 45px 45px 55px !important;
       gap: 0.25rem !important;
       padding: 0.5rem 0.3rem !important;
       margin-bottom: 0.5rem !important;
@@ -26,13 +26,13 @@
     }
 
     .leaderboard-row {
-      grid-template-columns: 30px 40px 1fr 45px 45px 55px 40px !important;
+      grid-template-columns: 30px 40px 1fr 45px 45px 55px !important;
       gap: 0.25rem !important;
       padding: 0.5rem 0.3rem !important;
     }
 
-    /* Hide label text on mobile, keep just numbers */
-    .leaderboard-hide-mobile {
+    /* Keep stat labels hidden on mobile, but show player type */
+    .stat-label {
       display: none !important;
     }
 
@@ -72,12 +72,6 @@
 
     .score-number {
       font-size: 1.4rem !important;
-    }
-
-    .status-badge {
-      font-size: 0.5rem !important;
-      padding: 0.25rem 0.15rem !important;
-      border-width: 2px !important;
     }
 
     /* Player box padding */
@@ -419,14 +413,13 @@
       </div>
 
       <!-- Column Headers -->
-      <div class="leaderboard-header" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 3px solid #ffffff; margin-bottom: 1rem;">
+      <div class="leaderboard-header" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 3px solid #ffffff; margin-bottom: 1rem;">
         <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">RANK</span><span class="header-short" style="display: none;">RK</span></div>
         <div></div>
         <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;"><span class="header-full">PLAYER</span><span class="header-short" style="display: none;">NAME</span></div>
         <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">AIS FOUND</span><span class="header-short" style="display: none;">AIs</span></div>
         <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">VOTES RCV'D</span><span class="header-short" style="display: none;">VOTES</span></div>
         <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">SCORE</span><span class="header-short" style="display: none;">PTS</span></div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">STATUS</span><span class="header-short" style="display: none;">-</span></div>
       </div>
 
       <!-- Human Player Rows -->
@@ -434,7 +427,7 @@
         <% @game.players.where(is_ai: false).order(score: :desc).each_with_index do |player, index| %>
           <% stats = @player_stats[player.id] || {} %>
           <div class="box" style="background: <%= index == 0 ? '#FFD700' : '#ffffff' %>; color: #000000; padding: 1.5rem; border: 4px solid <%= index == 0 ? '#FFD700' : '#cccccc' %>;">
-            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; align-items: center;">
+            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center;">
 
               <!-- Rank + Avatar + Name (grouped for mobile) -->
               <div style="display: contents;">
@@ -457,8 +450,8 @@
                   <div class="player-name" style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
                     <%= player.character_name %>
                   </div>
-                  <div class="player-type leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
-                    ■ HUMAN PLAYER
+                  <div class="player-type" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
+                    ■ <%= player == @current_player ? "YOU" : player.email %>
                   </div>
                 </div>
               </div>
@@ -470,7 +463,7 @@
                   <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= stats[:correct_votes] || 0 %>/2
                   </div>
-                  <div class="stat-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  <div class="stat-label" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
                     +<%= stats[:points_from_guesses] || 0 %> pts
                   </div>
                 </div>
@@ -480,7 +473,7 @@
                   <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= stats[:votes_received] || 0 %>
                   </div>
-                  <div class="stat-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  <div class="stat-label" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
                     +<%= stats[:points_from_deception] || 0 %> pts
                   </div>
                 </div>
@@ -493,22 +486,9 @@
                   <div class="score-number" style="font-size: 2.5rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= player.score || 0 %>
                   </div>
-                  <div class="score-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; margin-top: 0.25rem;">
+                  <div class="stat-label" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; margin-top: 0.25rem;">
                     POINTS
                   </div>
-                </div>
-
-                <!-- Status Badge -->
-                <div class="status-cell leaderboard-hide-mobile" style="text-align: center;">
-                  <% if index == 0 %>
-                    <div class="status-badge" style="background: #FFD700; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
-                      WINNER
-                    </div>
-                  <% else %>
-                    <div class="status-badge" style="background: #ffffff; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
-                      HUMAN
-                    </div>
-                  <% end %>
                 </div>
               </div>
 
@@ -520,7 +500,7 @@
         <% @game.players.where(is_ai: true).each do |player| %>
           <% stats = @player_stats[player.id] || {} %>
           <div class="box" style="background: #cccccc; color: #000000; padding: 1.5rem; border: 4px solid #999999;">
-            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; align-items: center;">
+            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center;">
 
               <!-- Rank + Avatar + Name -->
               <div style="display: contents;">
@@ -539,7 +519,7 @@
                   <div class="player-name" style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
                     <%= player.character_name %>
                   </div>
-                  <div class="player-type leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
+                  <div class="player-type" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
                     ■ AI PLAYER
                   </div>
                 </div>
@@ -570,13 +550,6 @@
                     —
                   </div>
                 </div>
-
-                <!-- Status Badge -->
-                <div class="status-cell leaderboard-hide-mobile" style="text-align: center;">
-                  <div class="status-badge" style="background: #000000; color: #ffffff; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
-                    AI
-                  </div>
-                </div>
               </div>
 
             </div>
@@ -594,39 +567,6 @@
           • Each vote received as AI (humans only): <strong>+1 point</strong> (fooled other players!)<br>
           • AIs Found: Shows how many of the 2 AI players you correctly identified
         </div>
-      </div>
-    </div>
-
-    <!-- The Reveal: All Characters -->
-    <div class="box reveal-container" style="padding: 2rem; margin-bottom: 2rem;">
-      <div class="box-header" style="text-align: center; margin-bottom: 2rem;">
-        ► THE REVEAL ◄
-      </div>
-
-      <div class="reveal-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-        <% @game.players.where(is_ai: false).each do |player| %>
-          <div class="box reveal-box" style="background: #ffffff; padding: 1.5rem; text-align: center;">
-            <div style="width: 100px; height: 100px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.5rem; margin: 0 auto 1rem;">
-              <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
-            </div>
-            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase; font-family: 'Courier New', monospace;"><%= player.character_name %></h4>
-            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; padding: 0.5rem; background: #000000; color: #ffffff; font-weight: bold; text-transform: uppercase;">
-              ■ HUMAN
-            </div>
-          </div>
-        <% end %>
-
-        <% @game.players.where(is_ai: true).each do |player| %>
-          <div class="box reveal-box" style="background: #000000; color: #ffffff; padding: 1.5rem; text-align: center;">
-            <div style="width: 100px; height: 100px; background: #ffffff; border: 3px solid #ffffff; display: flex; align-items: center; justify-content: center; padding: 0.5rem; margin: 0 auto 1rem;">
-              <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
-            </div>
-            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; text-transform: uppercase; font-family: 'Courier New', monospace;"><%= player.character_name %></h4>
-            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; padding: 0.5rem; background: #ffffff; color: #000000; font-weight: bold; text-transform: uppercase; border: 2px solid #ffffff;">
-              ■ AI
-            </div>
-          </div>
-        <% end %>
       </div>
     </div>
 
