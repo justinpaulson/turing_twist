@@ -1,9 +1,15 @@
 class AiPlayerService
-  attr_reader :player, :round
+  attr_reader :player, :round, :game
 
-  def initialize(player, round)
+  def initialize(player, round_or_game)
     @player = player
-    @round = round
+    if round_or_game.is_a?(Round)
+      @round = round_or_game
+      @game = round_or_game.game
+    else
+      @game = round_or_game
+      @round = nil
+    end
   end
 
   def generate_answer
@@ -25,16 +31,16 @@ class AiPlayerService
 
   def generate_vote
     # Check if this AI has already cast all their votes
-    existing_votes_count = player.votes_cast.where(round: round).count
+    existing_votes_count = player.votes_cast.where(game: game).count
     return if existing_votes_count >= Vote::MAX_VOTES_PER_PLAYER
 
     # Get all answers from answering rounds (1-5)
-    answering_rounds = round.game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
+    answering_rounds = game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
     all_answers = Answer.where(round: answering_rounds).includes(:player, :round)
 
     # Get answers grouped by player, excluding this AI and already voted players
-    already_voted_ids = player.votes_cast.where(round: round).pluck(:voted_for_id)
-    available_players = round.game.active_players.where.not(id: [ player.id ] + already_voted_ids)
+    already_voted_ids = player.votes_cast.where(game: game).pluck(:voted_for_id)
+    available_players = game.active_players.where.not(id: [ player.id ] + already_voted_ids)
 
     return if available_players.empty?
 
@@ -48,7 +54,7 @@ class AiPlayerService
     voted_player_id = parse_vote_response_from_players(response, available_players)
 
     player.votes_cast.create!(
-      round: round,
+      game: game,
       voted_for_id: voted_player_id
     )
 
@@ -64,7 +70,7 @@ class AiPlayerService
     [
       {
         role: "system",
-        content: "#{player.ai_persona}\n\nIMPORTANT: Keep your answer EXTREMELY SHORT - often just a few words or a single short sentence. Most answers should be 5-10 words MAX. Real people don't write paragraphs in quick chat games. Just answer the question directly and briefly. Be specific (mention real song names, brands, places, etc). The shorter, the better."
+        content: "#{player.ai_persona}\n\nIMPORTANT: Keep your answer EXTREMELY SHORT - often just a few words or a single short sentence. Most answers should be 5-10 words MAX. Real people don't write paragraphs in quick chat games. Just answer the question directly and briefly. Be specific (mention real song names, brands, places, etc). The shorter, the better. NEVER use emojis in your response - real people almost never use them in this game."
       },
       {
         role: "user",
@@ -84,7 +90,7 @@ class AiPlayerService
     end.join("\n\n")
 
     already_voted_text = if already_voted_ids.any?
-      already_voted_names = round.game.players.where(id: already_voted_ids).pluck(:character_name).join(", ")
+      already_voted_names = game.players.where(id: already_voted_ids).pluck(:character_name).join(", ")
       "\n\nYou have already voted for: #{already_voted_names}. Choose someone different."
     else
       ""

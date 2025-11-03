@@ -12,10 +12,10 @@ Rails.application.routes.draw do
         post :submit_answer
         post :start_voting
       end
-      resources :votes, only: [ :create ] do
-        collection do
-          get :results
-        end
+    end
+    resources :votes, only: [ :create ] do
+      collection do
+        get :results
       end
     end
   end

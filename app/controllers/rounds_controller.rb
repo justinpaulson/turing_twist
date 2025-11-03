@@ -33,11 +33,11 @@ class RoundsController < ApplicationController
       # Group answers by player
       @answers_by_player = all_answers.group_by(&:player)
 
-      @my_votes = @round.votes.where(voter: @current_player)
+      @my_votes = @game.votes.where(voter: @current_player)
       @voted_for_ids = @my_votes.pluck(:voted_for_id)
     elsif @round.completed?
       @answers = @round.answers.includes(:player)
-      @votes = @round.votes.includes(:voter, :voted_for)
+      @votes = @game.votes.includes(:voter, :voted_for)
       @vote_counts = @votes.group(:voted_for).count
     end
   end
