@@ -136,6 +136,7 @@ class GamesController < ApplicationController
 
   def calculate_player_stats
     @player_stats = {}
+    @player_answers = {}
 
     @game.players.each do |player|
       # Get votes this player received
@@ -158,6 +159,9 @@ class GamesController < ApplicationController
         points_from_deception: points_from_deception,
         total_score: player.score || 0
       }
+
+      # Get all answers for this player with their rounds
+      @player_answers[player.id] = player.answers.includes(:round).order("rounds.round_number")
     end
   end
 end

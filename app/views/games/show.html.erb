@@ -1,6 +1,21 @@
 <%= turbo_stream_from @game %>
 
 <style>
+  /* Clickable row hover effects */
+  .clickable-row:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .close-answers-btn:hover {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .answers-section {
+    overflow: hidden;
+    transition: opacity 0.2s ease-out;
+  }
+
   @media (max-width: 768px) {
     /* Final Leaderboard - Compact horizontal rows on mobile */
     .leaderboard-header {
@@ -9,6 +24,18 @@
       padding: 0.5rem 0.3rem !important;
       margin-bottom: 0.5rem !important;
       border-bottom-width: 2px !important;
+    }
+
+    /* Answers section on mobile */
+    .answers-section {
+      padding: 0.75rem !important;
+      margin-top: 0.5rem !important;
+    }
+
+    .close-answers-btn {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 1rem !important;
     }
 
     .leaderboard-header > div {
@@ -433,9 +460,10 @@
       <div style="display: grid; gap: 0.5rem;">
         <% @game.players.where(is_ai: false).order(score: :desc).each_with_index do |player, index| %>
           <% stats = @player_stats[player.id] || {} %>
-          <div class="box" style="background: <%= index == 0 ? '#FFD700' : '#ffffff' %>; color: #000000; padding: 1.5rem; border: 4px solid <%= index == 0 ? '#FFD700' : '#cccccc' %>;">
+          <% player_answers = @player_answers[player.id] || [] %>
+          <div class="box player-row-container" data-player-id="<%= player.id %>" style="background: <%= index == 0 ? '#FFD700' : '#ffffff' %>; color: #000000; padding: 1.5rem; border: 4px solid <%= index == 0 ? '#FFD700' : '#cccccc' %>;">
             <!-- Main Stats Row -->
-            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center;">
+            <div class="leaderboard-row clickable-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center; cursor: pointer;">
 
               <!-- Rank + Avatar + Name (grouped for mobile) -->
               <div style="display: contents;">
@@ -500,9 +528,36 @@
             </div>
 
             <!-- Email Subrow -->
-            <div class="player-email-subrow" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.05); border: 2px solid rgba(0,0,0,0.1);">
+            <div class="player-email-subrow clickable-row" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.05); border: 2px solid rgba(0,0,0,0.1); cursor: pointer;">
               <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
                 ■ <%= player == @current_player ? "YOU" : player.user&.email_address %>
+              </div>
+            </div>
+
+            <!-- Expandable Answers Section -->
+            <div class="answers-section" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.05); border: 3px solid #000000;">
+              <!-- Close Button -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid #000000; padding-bottom: 0.5rem;">
+                <div style="font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; text-transform: uppercase;">
+                  ► <%= player.character_name %>'S ANSWERS
+                </div>
+                <button class="close-answers-btn" style="background: #000000; color: #ffffff; border: 3px solid #000000; width: 32px; height: 32px; cursor: pointer; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace;">
+                  ✕
+                </button>
+              </div>
+
+              <!-- Answers List -->
+              <div style="display: grid; gap: 0.75rem;">
+                <% player_answers.each_with_index do |answer, answer_index| %>
+                  <div style="background: #ffffff; border: 3px solid #000000; padding: 0.75rem;">
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.5rem;">
+                      Q<%= answer_index + 1 %>: <%= answer.round.question %>
+                    </div>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.5;">
+                      <%= answer.content %>
+                    </div>
+                  </div>
+                <% end %>
               </div>
             </div>
           </div>
@@ -511,9 +566,10 @@
         <!-- AI Player Rows (no rank or points) -->
         <% @game.players.where(is_ai: true).each do |player| %>
           <% stats = @player_stats[player.id] || {} %>
-          <div class="box" style="background: #cccccc; color: #000000; padding: 1.5rem; border: 4px solid #999999;">
+          <% player_answers = @player_answers[player.id] || [] %>
+          <div class="box player-row-container" data-player-id="<%= player.id %>" style="background: #cccccc; color: #000000; padding: 1.5rem; border: 4px solid #999999;">
             <!-- Main Stats Row -->
-            <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center;">
+            <div class="leaderboard-row clickable-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px; gap: 1rem; align-items: center; cursor: pointer;">
 
               <!-- Rank + Avatar + Name -->
               <div style="display: contents;">
@@ -565,9 +621,36 @@
             </div>
 
             <!-- AI Player Type Subrow -->
-            <div class="player-email-subrow" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.2);">
+            <div class="player-email-subrow clickable-row" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.2); cursor: pointer;">
               <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
                 ■ AI PLAYER
+              </div>
+            </div>
+
+            <!-- Expandable Answers Section -->
+            <div class="answers-section" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.15); border: 3px solid #000000;">
+              <!-- Close Button -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid #000000; padding-bottom: 0.5rem;">
+                <div style="font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; text-transform: uppercase;">
+                  ► <%= player.character_name %>'S ANSWERS
+                </div>
+                <button class="close-answers-btn" style="background: #000000; color: #ffffff; border: 3px solid #000000; width: 32px; height: 32px; cursor: pointer; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace;">
+                  ✕
+                </button>
+              </div>
+
+              <!-- Answers List -->
+              <div style="display: grid; gap: 0.75rem;">
+                <% player_answers.each_with_index do |answer, answer_index| %>
+                  <div style="background: #ffffff; border: 3px solid #000000; padding: 0.75rem;">
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.5rem;">
+                      Q<%= answer_index + 1 %>: <%= answer.round.question %>
+                    </div>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.5;">
+                      <%= answer.content %>
+                    </div>
+                  </div>
+                <% end %>
               </div>
             </div>
           </div>
@@ -587,5 +670,58 @@
     </div>
 
     <%= link_to "← BACK TO GAMES", games_path, class: "btn", style: "display: block; width: fit-content; margin: 2rem auto 0;" %>
+
+    <script>
+      function initializeLeaderboardExpansion() {
+        const playerRows = document.querySelectorAll('.player-row-container');
+
+        playerRows.forEach(container => {
+          // Skip if already initialized
+          if (container.dataset.initialized === 'true') {
+            return;
+          }
+
+          // Mark as initialized
+          container.dataset.initialized = 'true';
+
+          const answersSection = container.querySelector('.answers-section');
+          const closeBtn = container.querySelector('.close-answers-btn');
+
+          // Add click handler to the container itself
+          container.addEventListener('click', function(e) {
+            // Don't trigger if clicking inside the answers section (except close button)
+            if (answersSection.contains(e.target) && !closeBtn.contains(e.target)) {
+              return;
+            }
+
+            // Close all other expanded sections first
+            document.querySelectorAll('.answers-section').forEach(section => {
+              if (section !== answersSection) {
+                section.style.display = 'none';
+              }
+            });
+
+            // Toggle this section
+            if (answersSection.style.display === 'none' || answersSection.style.display === '') {
+              answersSection.style.display = 'block';
+            } else {
+              answersSection.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      // Support both regular page loads and Turbo navigation
+      document.addEventListener('DOMContentLoaded', initializeLeaderboardExpansion);
+      document.addEventListener('turbo:load', initializeLeaderboardExpansion);
+
+      // Call immediately in case DOM is already loaded
+      if (document.readyState === 'loading') {
+        // Still loading, wait for DOMContentLoaded
+      } else {
+        // DOM already loaded, call function immediately
+        initializeLeaderboardExpansion();
+      }
+    </script>
   </div>
 <% end %>
