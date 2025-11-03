@@ -64,10 +64,6 @@ class RoundsController < ApplicationController
 
       # If this was the last answering round, go to voting page
       if @round.round_number >= Game::TOTAL_ROUNDS
-        # Generate AI votes
-        @game.active_ai_players.each do |ai_player|
-          AiPlayerService.new(ai_player, @game).generate_vote
-        end
         redirect_to voting_game_path(@game), notice: "All questions answered! Time to vote!"
       else
         # Create next answering round

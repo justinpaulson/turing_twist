@@ -87,8 +87,8 @@ class Game < ApplicationRecord
   end
 
   def voting_complete?
-    # Each active player should vote for 2 players
-    expected_count = active_players.count * Vote::MAX_VOTES_PER_PLAYER
+    # Only human players vote - each should vote for 2 players
+    expected_count = active_human_players.count * Vote::MAX_VOTES_PER_PLAYER
     actual_count = votes.count
     expected_count > 0 && actual_count >= expected_count
   end
