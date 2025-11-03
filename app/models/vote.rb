@@ -1,5 +1,5 @@
 class Vote < ApplicationRecord
-  belongs_to :round
+  belongs_to :game
   belongs_to :voter, class_name: "Player"
   belongs_to :voted_for, class_name: "Player"
 
@@ -22,7 +22,7 @@ class Vote < ApplicationRecord
   end
 
   def cannot_exceed_vote_limit
-    existing_votes = Vote.where(round_id: round_id, voter_id: voter_id).where.not(id: id).count
+    existing_votes = Vote.where(game_id: game_id, voter_id: voter_id).where.not(id: id).count
     if existing_votes >= MAX_VOTES_PER_PLAYER
       errors.add(:base, "cannot vote for more than #{MAX_VOTES_PER_PLAYER} players")
     end

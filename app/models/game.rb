@@ -1,6 +1,7 @@
 class Game < ApplicationRecord
   has_many :players, dependent: :destroy
   has_many :rounds, dependent: :destroy
+  has_many :votes, dependent: :destroy
   has_many :users, through: :players
 
   broadcasts_refreshes
@@ -78,6 +79,17 @@ class Game < ApplicationRecord
 
   def max_points_from_guesses
     points_per_correct_guess * AI_PLAYERS_COUNT
+  end
+
+  def all_rounds_complete?
+    rounds.count >= TOTAL_ROUNDS && rounds.all?(&:completed?)
+  end
+
+  def voting_complete?
+    # Each active player should vote for 2 players
+    expected_count = active_players.count * Vote::MAX_VOTES_PER_PLAYER
+    actual_count = votes.count
+    expected_count > 0 && actual_count >= expected_count
   end
 
   private

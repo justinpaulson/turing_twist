@@ -199,10 +199,10 @@
     <!-- Vote count -->
     <div class="box" style="text-align: center; padding: 1.5rem; margin-top: 2rem;">
       <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em;">
-        <strong><%= @round.votes.count %></strong> / <strong><%= @game.active_players.count * Vote::MAX_VOTES_PER_PLAYER %></strong> TOTAL VOTES CAST
+        <strong><%= @game.votes.count %></strong> / <strong><%= @game.active_players.count * Vote::MAX_VOTES_PER_PLAYER %></strong> TOTAL VOTES CAST
       </div>
       <div style="font-family: 'Courier New', monospace; font-size: 0.95rem; margin-top: 0.5rem; opacity: 0.8;">
-        <%= @game.active_players.count { |p| @round.votes.where(voter: p).count >= Vote::MAX_VOTES_PER_PLAYER } %> / <%= @game.active_players.count %> players finished voting
+        <%= @game.active_players.count { |p| @game.votes.where(voter: p).count >= Vote::MAX_VOTES_PER_PLAYER } %> / <%= @game.active_players.count %> players finished voting
       </div>
     </div>
 
@@ -246,7 +246,7 @@
       Are you sure you want to vote for<br><strong style="font-size: 1.3rem; text-transform: uppercase;" id="voteName"></strong><br>as the AI?
     </p>
 
-    <%= form_with url: game_round_votes_path(@game, @round), local: false, data: { turbo: true } do |f| %>
+    <%= form_with url: game_votes_path(@game), local: false, data: { turbo: true } do |f| %>
       <%= f.hidden_field :voted_for_id, id: "votePlayerId" %>
       <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
         <%= f.submit "YES, VOTE", class: "btn", style: "flex: 1; background: #000000; color: #ffffff; padding: 1rem; font-size: 1rem;" %>
