@@ -27,8 +27,9 @@
     <% if next_round %>
       <%= link_to "CONTINUE TO NEXT ROUND ►", game_round_path(@game, next_round), class: "btn", style: "font-size: 1.3rem; padding: 1.5rem 3rem;" %>
     <% else %>
-      <div class="box" style="padding: 2rem; font-family: 'Courier New', monospace; font-size: 1.1rem;">
-        ⏳ PREPARING NEXT ROUND...
+      <div class="box" style="padding: 2rem; font-family: 'Courier New', monospace; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <%= image_tag "hourglass.svg", style: "width: 20px; height: 20px;" %>
+        PREPARING NEXT ROUND...
       </div>
       <script>
         setTimeout(function() {

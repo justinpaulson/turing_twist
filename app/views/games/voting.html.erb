@@ -22,8 +22,9 @@
         </div>
       <% end %>
       <% if @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER %>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
-          ⏳ Waiting for other players to vote...
+        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <%= image_tag "hourglass.svg", style: "width: 16px; height: 16px; filter: invert(1);" %>
+          Waiting for other players to vote...
         </div>
       <% end %>
     </div>

@@ -38,8 +38,9 @@
           <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em;">
             ■ YOUR ANSWER HAS BEEN SUBMITTED
           </div>
-          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
-            ⏳ Waiting for other players...
+          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <%= image_tag "hourglass.svg", style: "width: 16px; height: 16px; filter: invert(1);" %>
+            Waiting for other players...
           </div>
         </div>
       <% else %>
@@ -142,8 +143,9 @@
           </div>
         <% end %>
         <% if @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER %>
-          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">
-            ⏳ Waiting for other players to vote...
+          <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <%= image_tag "hourglass.svg", style: "width: 16px; height: 16px; filter: invert(1);" %>
+            Waiting for other players to vote...
           </div>
         <% end %>
       </div>
@@ -221,8 +223,9 @@
       <% else %>
         <!-- No next round yet, auto-refresh to check -->
         <div class="box" style="padding: 2rem; text-align: center;">
-          <div style="font-family: 'Courier New', monospace; font-size: 1.1rem;">
-            ⏳ PREPARING NEXT ROUND...
+          <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <%= image_tag "hourglass.svg", style: "width: 20px; height: 20px;" %>
+            PREPARING NEXT ROUND...
           </div>
         </div>
         <script>
