@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_000602) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_02_193224) do
   create_table "answers", force: :cascade do |t|
     t.integer "round_id", null: false
     t.integer "player_id", null: false
@@ -199,12 +199,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_000602) do
   end
 
   create_table "votes", force: :cascade do |t|
+    t.integer "round_id", null: false
     t.integer "voter_id", null: false
     t.integer "voted_for_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "game_id", null: false
-    t.index ["game_id"], name: "index_votes_on_game_id"
+    t.index ["round_id"], name: "index_votes_on_round_id"
     t.index ["voted_for_id"], name: "index_votes_on_voted_for_id"
     t.index ["voter_id"], name: "index_votes_on_voter_id"
   end
@@ -221,7 +221,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_000602) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "votes", "games"
   add_foreign_key "votes", "players", column: "voted_for_id"
   add_foreign_key "votes", "players", column: "voter_id"
+  add_foreign_key "votes", "rounds"
 end

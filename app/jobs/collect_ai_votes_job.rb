@@ -1,17 +1,17 @@
 class CollectAiVotesJob < ApplicationJob
   queue_as :default
 
-  def perform(game)
-    return unless game.all_rounds_complete?
+  def perform(round)
+    return unless round.voting?
 
     # Generate votes for all AI players
-    game.active_ai_players.each do |ai_player|
-      AiPlayerService.new(ai_player, game).generate_vote
+    round.game.active_ai_players.each do |ai_player|
+      AiPlayerService.new(ai_player, round).generate_vote
     end
 
     # Check if voting is complete
-    if game.voting_complete?
-      GameManager.new(game).process_voting_results!
+    if round.voting_complete?
+      GameManager.new(round.game).process_voting_results!(round)
     end
   end
 end

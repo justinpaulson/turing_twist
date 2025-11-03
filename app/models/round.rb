@@ -1,6 +1,7 @@
 class Round < ApplicationRecord
   belongs_to :game
   has_many :answers, dependent: :destroy
+  has_many :votes, dependent: :destroy
 
   enum :status, { answering: 0, reviewing: 1, voting: 2, completed: 3 }
 
@@ -43,6 +44,13 @@ class Round < ApplicationRecord
   def all_players_answered?
     expected_count = game.active_players.count
     actual_count = answers.count
+    expected_count > 0 && actual_count >= expected_count
+  end
+
+  def voting_complete?
+    # Each active player should vote for 2 players
+    expected_count = game.active_players.count * Vote::MAX_VOTES_PER_PLAYER
+    actual_count = votes.count
     expected_count > 0 && actual_count >= expected_count
   end
 end

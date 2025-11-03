@@ -59,20 +59,18 @@ class GameManager
       # Generate AI votes immediately (inline) to ensure they happen
       # even if background jobs aren't running
       game.active_ai_players.each do |ai_player|
-        AiPlayerService.new(ai_player, game).generate_vote
+        AiPlayerService.new(ai_player, round).generate_vote
       end
 
       round
     end
   end
 
-  def process_voting_results!
+  def process_voting_results!(round)
     # Calculate scores based on votes
-    calculate_scores!
+    calculate_scores!(round)
 
-    # Mark the voting round as completed
-    voting_round = game.rounds.find_by(round_number: Game::TOTAL_ROUNDS + 1)
-    voting_round&.update!(status: :completed, ended_at: Time.current)
+    round.update!(status: :completed, ended_at: Time.current)
 
     # Game is complete after voting
     game.update!(status: :completed)
@@ -91,21 +89,21 @@ class GameManager
     end
   end
 
-  def calculate_scores!
+  def calculate_scores!(round)
     points_per_correct = game.points_per_correct_guess
 
     game.players.each do |player|
       score = 0
 
       # Points for correct AI guesses
-      player_votes = game.votes.where(voter: player)
+      player_votes = round.votes.where(voter: player)
       player_votes.each do |vote|
         score += points_per_correct if vote.voted_for.is_ai?
       end
 
       # Points for deceiving others (being voted as AI when you're human)
       if !player.is_ai?
-        votes_received = game.votes.where(voted_for: player).count
+        votes_received = round.votes.where(voted_for: player).count
         score += votes_received
       end
 

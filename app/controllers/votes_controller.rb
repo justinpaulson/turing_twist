@@ -1,37 +1,33 @@
 class VotesController < ApplicationController
-  before_action :set_game
+  before_action :set_game_and_round
 
   def create
     @current_player = @game.players.find_by(user: Current.user)
-    @current_round = @game.current_round_object
 
-    # Only allow voting when all rounds are complete and we're in voting phase
-    if @game.all_rounds_complete? && @current_player && !@current_player.is_eliminated?
+    if @round.voting? && @current_player && !@current_player.is_eliminated?
       vote = @current_player.votes_cast.build(
-        game: @game,
+        round: @round,
         voted_for_id: params[:voted_for_id]
       )
 
       if vote.save
         # Check if voting is complete
-        if @game.voting_complete?
-          GameManager.new(@game).process_voting_results!
+        if @round.voting_complete?
+          GameManager.new(@game).process_voting_results!(@round)
         end
 
-        # Redirect back to current round
-        redirect_to game_round_path(@game, @current_round)
+        redirect_to game_round_path(@game, @round)
       else
-        redirect_to game_round_path(@game, @current_round), alert: vote.errors.full_messages.join(", ")
+        redirect_to game_round_path(@game, @round), alert: vote.errors.full_messages.join(", ")
       end
     else
-      # If not ready for voting, redirect to current round
-      redirect_to game_round_path(@game, @current_round || @game.rounds.first), alert: "Cannot vote now."
+      redirect_to game_round_path(@game, @round), alert: "Cannot vote now."
     end
   end
 
   def results
     @current_player = @game.players.find_by(user: Current.user)
-    @votes = @game.votes.includes(:voter, :voted_for)
+    @votes = @round.votes.includes(:voter, :voted_for)
     @vote_counts = @votes.group_by(&:voted_for).transform_values(&:count)
 
     # Find the eliminated player
@@ -44,7 +40,8 @@ class VotesController < ApplicationController
 
   private
 
-  def set_game
+  def set_game_and_round
     @game = Game.find(params[:game_id])
+    @round = @game.rounds.find(params[:round_id])
   end
 end
