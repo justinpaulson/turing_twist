@@ -2,32 +2,71 @@
 
 <style>
   @media (max-width: 768px) {
-    /* Final Leaderboard - Stack layout on mobile */
+    /* Final Leaderboard - Compact horizontal rows on mobile */
     .leaderboard-header {
       display: none !important;
     }
 
     .leaderboard-row {
-      grid-template-columns: 1fr !important;
-      gap: 0.75rem !important;
-      padding: 1rem !important;
+      grid-template-columns: 30px 40px 1fr 45px 45px 55px 40px !important;
+      gap: 0.25rem !important;
+      padding: 0.5rem 0.3rem !important;
     }
 
-    .leaderboard-rank-mobile,
-    .leaderboard-player-mobile,
-    .leaderboard-stats-mobile,
-    .leaderboard-score-mobile {
-      display: flex !important;
-      align-items: center !important;
-      gap: 0.75rem !important;
-    }
-
+    /* Hide label text on mobile, keep just numbers */
     .leaderboard-hide-mobile {
       display: none !important;
     }
 
-    .leaderboard-show-mobile {
-      display: block !important;
+    /* Individual cell sizing */
+    .rank-cell {
+      font-size: 1.2rem !important;
+    }
+
+    .trophy-icon {
+      width: 30px !important;
+      height: 30px !important;
+      border-width: 2px !important;
+    }
+
+    .avatar-cell {
+      width: 40px !important;
+      height: 40px !important;
+      padding: 0.2rem !important;
+      border-width: 2px !important;
+    }
+
+    .player-name {
+      font-size: 0.7rem !important;
+      letter-spacing: 0.02em !important;
+      margin-bottom: 0 !important;
+      line-height: 1.2 !important;
+    }
+
+    .stat-number {
+      font-size: 1rem !important;
+    }
+
+    .score-cell {
+      padding: 0.4rem 0.2rem !important;
+      border-width: 2px !important;
+    }
+
+    .score-number {
+      font-size: 1.4rem !important;
+    }
+
+    .status-badge {
+      font-size: 0.5rem !important;
+      padding: 0.25rem 0.15rem !important;
+      border-width: 2px !important;
+    }
+
+    /* Player box padding */
+    .leaderboard-row + .leaderboard-row,
+    .box:has(.leaderboard-row) {
+      padding: 0.5rem 0.3rem !important;
+      border-width: 3px !important;
     }
 
     /* Reveal section - single column and reduced padding */
@@ -380,79 +419,75 @@
             <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; align-items: center;">
 
               <!-- Rank + Avatar + Name (grouped for mobile) -->
-              <div class="leaderboard-player-mobile" style="display: contents;">
+              <div style="display: contents;">
                 <!-- Rank -->
-                <div style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace;">
+                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace;">
                   <% if index == 0 %>
-                    <%= image_tag "trophy.svg", style: "width: 50px; height: 50px; border: 3px solid #000000;" %>
+                    <%= image_tag "trophy.svg", class: "trophy-icon", style: "width: 50px; height: 50px; border: 3px solid #000000;" %>
                   <% else %>
                     <%= index + 1 %>
                   <% end %>
                 </div>
 
                 <!-- Avatar -->
-                <div style="width: 70px; height: 70px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.4rem;">
+                <div class="avatar-cell" style="width: 70px; height: 70px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.4rem;">
                   <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
                 </div>
 
                 <!-- Player Name -->
-                <div>
-                  <div style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <div class="name-cell">
+                  <div class="player-name" style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
                     <%= player.character_name %>
                   </div>
-                  <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
+                  <div class="player-type leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
                     ■ HUMAN PLAYER
                   </div>
                 </div>
               </div>
 
-              <!-- Stats (grouped for mobile) -->
-              <div class="leaderboard-stats-mobile" style="display: contents;">
+              <!-- Stats -->
+              <div style="display: contents;">
                 <!-- AIs Found (X/2) -->
-                <div style="text-align: center;">
-                  <div class="leaderboard-hide-mobile" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="stat-cell" style="text-align: center;">
+                  <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= stats[:correct_votes] || 0 %>/2
                   </div>
-                  <div class="leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  <div class="stat-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
                     +<%= stats[:points_from_guesses] || 0 %> pts
-                  </div>
-                  <!-- Mobile: Combined stats display -->
-                  <div class="leaderboard-show-mobile" style="display: none; font-family: 'Courier New', monospace; font-size: 0.9rem;">
-                    <strong>AIs Found:</strong> <%= stats[:correct_votes] || 0 %>/2 (+<%= stats[:points_from_guesses] || 0 %> pts) | <strong>Votes:</strong> <%= stats[:votes_received] || 0 %> (+<%= stats[:points_from_deception] || 0 %> pts)
                   </div>
                 </div>
 
                 <!-- Votes Received -->
-                <div class="leaderboard-hide-mobile" style="text-align: center;">
-                  <div style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="stat-cell" style="text-align: center;">
+                  <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= stats[:votes_received] || 0 %>
                   </div>
-                  <div style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
+                  <div class="stat-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 0.25rem;">
                     +<%= stats[:points_from_deception] || 0 %> pts
                   </div>
                 </div>
               </div>
 
-              <!-- Score + Status (grouped for mobile) -->
-              <div class="leaderboard-score-mobile" style="display: contents;">
+              <!-- Score + Status -->
+              <div style="display: contents;">
                 <!-- Total Score -->
-                <div style="text-align: center; background: #000000; color: <%= index == 0 ? '#FFD700' : '#ffffff' %>; padding: 1rem; border: 3px solid #000000;">
-                  <div style="font-size: 2.5rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="score-cell" style="text-align: center; background: #000000; color: <%= index == 0 ? '#FFD700' : '#ffffff' %>; padding: 1rem; border: 3px solid #000000;">
+                  <div class="score-number" style="font-size: 2.5rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= player.score || 0 %>
                   </div>
-                  <div style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; margin-top: 0.25rem;">
+                  <div class="score-label leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; margin-top: 0.25rem;">
                     POINTS
                   </div>
                 </div>
 
                 <!-- Status Badge -->
-                <div class="leaderboard-hide-mobile" style="text-align: center;">
+                <div class="status-cell leaderboard-hide-mobile" style="text-align: center;">
                   <% if index == 0 %>
-                    <div style="background: #FFD700; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                    <div class="status-badge" style="background: #FFD700; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
                       WINNER
                     </div>
                   <% else %>
-                    <div style="background: #ffffff; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                    <div class="status-badge" style="background: #ffffff; color: #000000; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
                       HUMAN
                     </div>
                   <% end %>
@@ -469,62 +504,58 @@
           <div class="box" style="background: #cccccc; color: #000000; padding: 1.5rem; border: 4px solid #999999;">
             <div class="leaderboard-row" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; align-items: center;">
 
-              <!-- Rank + Avatar + Name (grouped for mobile) -->
-              <div class="leaderboard-player-mobile" style="display: contents;">
+              <!-- Rank + Avatar + Name -->
+              <div style="display: contents;">
                 <!-- No Rank (just dash) -->
-                <div style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace; opacity: 0.5;">
+                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace; opacity: 0.5;">
                   —
                 </div>
 
                 <!-- Avatar -->
-                <div style="width: 70px; height: 70px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.4rem;">
+                <div class="avatar-cell" style="width: 70px; height: 70px; background: #000000; border: 3px solid #000000; display: flex; align-items: center; justify-content: center; padding: 0.4rem;">
                   <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
                 </div>
 
                 <!-- Player Name -->
-                <div>
-                  <div style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <div class="name-cell">
+                  <div class="player-name" style="font-size: 1.4rem; font-weight: bold; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
                     <%= player.character_name %>
                   </div>
-                  <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
+                  <div class="player-type leaderboard-hide-mobile" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
                     ■ AI PLAYER
                   </div>
                 </div>
               </div>
 
-              <!-- Stats (grouped for mobile) -->
-              <div class="leaderboard-stats-mobile" style="display: contents;">
+              <!-- Stats -->
+              <div style="display: contents;">
                 <!-- AIs Found (N/A for AIs) -->
-                <div class="leaderboard-hide-mobile" style="text-align: center; opacity: 0.5;">
-                  <div style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="stat-cell" style="text-align: center; opacity: 0.5;">
+                  <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     —
                   </div>
                 </div>
 
                 <!-- Votes Received -->
-                <div style="text-align: center;">
-                  <div class="leaderboard-hide-mobile" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="stat-cell" style="text-align: center;">
+                  <div class="stat-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     <%= stats[:votes_received] || 0 %>
-                  </div>
-                  <!-- Mobile: Show votes -->
-                  <div class="leaderboard-show-mobile" style="display: none; font-family: 'Courier New', monospace; font-size: 0.9rem;">
-                    <strong>Votes Received:</strong> <%= stats[:votes_received] || 0 %>
                   </div>
                 </div>
               </div>
 
-              <!-- Score + Status (grouped for mobile) -->
-              <div class="leaderboard-score-mobile" style="display: contents;">
+              <!-- Score + Status -->
+              <div style="display: contents;">
                 <!-- No Score -->
-                <div class="leaderboard-hide-mobile" style="text-align: center; opacity: 0.5;">
-                  <div style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
+                <div class="score-cell" style="text-align: center; opacity: 0.5;">
+                  <div class="score-number" style="font-size: 2rem; font-weight: bold; font-family: 'Courier New', monospace;">
                     —
                   </div>
                 </div>
 
                 <!-- Status Badge -->
-                <div class="leaderboard-hide-mobile" style="text-align: center;">
-                  <div style="background: #000000; color: #ffffff; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
+                <div class="status-cell leaderboard-hide-mobile" style="text-align: center;">
+                  <div class="status-badge" style="background: #000000; color: #ffffff; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; border: 3px solid #000000;">
                     AI
                   </div>
                 </div>
