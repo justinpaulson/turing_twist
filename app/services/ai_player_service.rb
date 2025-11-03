@@ -46,5 +46,4 @@ class AiPlayerService
       }
     ]
   end
-
 end
