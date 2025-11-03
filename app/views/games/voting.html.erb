@@ -1,6 +1,152 @@
 <%= turbo_stream_from @game %>
 
-<div class="container">
+<style>
+  /* Mobile responsive styles for voting page */
+  @media (max-width: 768px) {
+    .voting-container {
+      padding: 0.5rem !important;
+    }
+
+    .voting-container .box-header {
+      font-size: 1.2rem !important;
+      padding: 0.75rem 0.5rem;
+    }
+
+    .voting-container .box {
+      padding: 0 !important;
+    }
+
+    .voting-progress-box {
+      padding: 1rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .voting-progress-box > div:first-child {
+      font-size: 1rem !important;
+    }
+
+    .voting-progress-box > div:nth-child(2) {
+      font-size: 0.8rem !important;
+    }
+
+    .voting-progress-box > div:last-child {
+      font-size: 0.75rem !important;
+    }
+
+    .player-header {
+      padding: 1rem !important;
+      gap: 0.75rem !important;
+    }
+
+    .player-avatar-container {
+      width: 45px !important;
+      height: 45px !important;
+    }
+
+    .player-name {
+      font-size: 1.1rem !important;
+    }
+
+    .player-name .voted-badge {
+      font-size: 0.7rem !important;
+    }
+
+    .player-answer-count {
+      font-size: 0.75rem !important;
+    }
+
+    .vote-button {
+      padding: 0.5rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+
+    .player-answers-container {
+      padding: 1rem !important;
+    }
+
+    .answer-box {
+      padding: 0.75rem !important;
+    }
+
+    .answer-question {
+      font-size: 0.7rem !important;
+    }
+
+    .answer-content {
+      font-size: 0.85rem !important;
+    }
+
+    .vote-count-box {
+      padding: 1rem !important;
+    }
+
+    .vote-count-box > div:first-child {
+      font-size: 1rem !important;
+    }
+
+    .vote-count-box > div:last-child {
+      font-size: 0.8rem !important;
+    }
+
+    .voting-complete-box {
+      padding: 1.5rem 1rem !important;
+    }
+
+    .voting-complete-box > div:first-child {
+      font-size: 1rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .voting-complete-box .btn {
+      font-size: 1.1rem !important;
+      padding: 1rem 1.5rem !important;
+    }
+
+    .vote-modal-content {
+      padding: 1.5rem !important;
+      width: 95% !important;
+    }
+
+    .vote-modal-content h3 {
+      font-size: 1.2rem !important;
+    }
+
+    .vote-modal-content p {
+      font-size: 0.95rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .vote-modal-content strong {
+      font-size: 1.1rem !important;
+    }
+
+    .vote-modal-buttons {
+      flex-direction: column !important;
+    }
+
+    .vote-modal-buttons .btn,
+    .vote-modal-buttons button {
+      padding: 0.75rem !important;
+      font-size: 0.9rem !important;
+    }
+
+    .voting-container > p {
+      font-size: 0.95rem !important;
+      padding: 0 0.5rem;
+    }
+
+    .answers-grid {
+      gap: 1rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .answer-grid-inner {
+      gap: 0.75rem !important;
+    }
+  }
+</style>
+
+<div class="container voting-container">
   <div class="box-header" style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">
     ► TIME TO VOTE!
   </div>
@@ -8,7 +154,7 @@
 
   <!-- Voting Progress -->
   <% if @current_player && !@current_player.is_eliminated? %>
-    <div class="box" style="background: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#000000' : '#ffffff' %>; color: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#ffffff' : '#000000' %>; padding: 1.5rem; margin-bottom: 2rem; text-align: center; border: 4px solid #000000;">
+    <div class="box voting-progress-box" style="background: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#000000' : '#ffffff' %>; color: <%= @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#ffffff' : '#000000' %>; padding: 1.5rem; margin-bottom: 2rem; text-align: center; border: 4px solid #000000;">
       <div style="font-family: 'Courier New', monospace; font-size: 1.3rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">
         <% if @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER %>
           ■ VOTING COMPLETE (<%= @my_votes.count %>/<%= Vote::MAX_VOTES_PER_PLAYER %>)
@@ -31,44 +177,44 @@
   <% end %>
 
   <!-- Display all answers grouped by player -->
-  <div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="answers-grid" style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
     <% @answers_by_player.each do |player, player_answers| %>
       <% already_voted = @voted_for_ids&.include?(player.id) %>
       <div class="box" style="padding: 0; <%= already_voted ? 'background: #000000; color: #ffffff; border: 6px solid #000000;' : 'border: 4px solid #000000;' %>">
         <!-- Player Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>; border-bottom: 4px solid <%= already_voted ? '#ffffff' : '#000000' %>;">
+        <div class="player-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>; border-bottom: 4px solid <%= already_voted ? '#ffffff' : '#000000' %>;">
           <div style="display: flex; gap: 1rem; align-items: center; flex: 1;">
-            <div style="width: 60px; height: 60px; background: <%= already_voted ? '#ffffff' : '#000000' %>; border: 3px solid <%= already_voted ? '#ffffff' : '#000000' %>; display: flex; align-items: center; justify-content: center; padding: 0.35rem; flex-shrink: 0;">
+            <div class="player-avatar-container" style="width: 60px; height: 60px; background: <%= already_voted ? '#ffffff' : '#000000' %>; border: 3px solid <%= already_voted ? '#ffffff' : '#000000' %>; display: flex; align-items: center; justify-content: center; padding: 0.35rem; flex-shrink: 0;">
               <%= image_tag player.character_avatar_path, style: "width: 100%; height: 100%; object-fit: contain;" %>
             </div>
-            <div style="flex: 1;">
-              <h3 style="margin: 0; font-size: 1.5rem; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+            <div style="flex: 1; min-width: 0;">
+              <h3 class="player-name" style="margin: 0; font-size: 1.5rem; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 0.05em; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>; word-wrap: break-word;">
                 <%= player.character_name %>
                 <% if already_voted %>
-                  <span style="font-size: 0.9rem; opacity: 0.9;"> ✓ VOTED</span>
+                  <span class="voted-badge" style="font-size: 0.9rem; opacity: 0.9;"> ✓ VOTED</span>
                 <% end %>
               </h3>
-              <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 0.25rem; opacity: 0.8; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+              <div class="player-answer-count" style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 0.25rem; opacity: 0.8; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
                 <%= player_answers.count %> <%= 'answer'.pluralize(player_answers.count) %> from <%= Game::TOTAL_ROUNDS %> questions
               </div>
             </div>
           </div>
           <% if @current_player && !@current_player.is_eliminated? && @my_votes.count < Vote::MAX_VOTES_PER_PLAYER && !already_voted && player != @current_player %>
-            <button onclick="openVoteModal(<%= player.id %>, '<%= player.character_name %>')" class="btn" style="flex-shrink: 0; background: <%= already_voted ? '#ffffff' : '#000000' %>; color: <%= already_voted ? '#000000' : '#ffffff' %>; padding: 0.75rem 1.5rem; white-space: nowrap; font-family: 'Courier New', monospace; text-transform: uppercase; font-size: 0.9rem;">
+            <button onclick="openVoteModal(<%= player.id %>, '<%= player.character_name %>')" class="btn vote-button" style="flex-shrink: 0; background: <%= already_voted ? '#ffffff' : '#000000' %>; color: <%= already_voted ? '#000000' : '#ffffff' %>; padding: 0.75rem 1.5rem; white-space: nowrap; font-family: 'Courier New', monospace; text-transform: uppercase; font-size: 0.9rem;">
               ► Vote AI
             </button>
           <% end %>
         </div>
 
         <!-- Player's Answers -->
-        <div style="padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
-          <div style="display: grid; gap: 1rem;">
+        <div class="player-answers-container" style="padding: 1.5rem; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
+          <div class="answer-grid-inner" style="display: grid; gap: 1rem;">
             <% player_answers.each do |answer| %>
-              <div style="padding: 1rem; border: 2px solid <%= already_voted ? '#ffffff' : '#000000' %>; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
-                <div style="font-family: 'Courier New', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; opacity: 0.7; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
+              <div class="answer-box" style="padding: 1rem; border: 2px solid <%= already_voted ? '#ffffff' : '#000000' %>; background: <%= already_voted ? '#000000' : '#ffffff' %>;">
+                <div class="answer-question" style="font-family: 'Courier New', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; opacity: 0.7; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>">
                   ► Question <%= answer.round.round_number %>: <%= answer.round.question %>
                 </div>
-                <p style="margin: 0; line-height: 1.6; font-family: 'Courier New', monospace; font-size: 0.95rem; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>"><%= answer.content %></p>
+                <p class="answer-content" style="margin: 0; line-height: 1.6; font-family: 'Courier New', monospace; font-size: 0.95rem; <%= already_voted ? 'color: #ffffff;' : 'color: #000000;' %>"><%= answer.content %></p>
               </div>
             <% end %>
           </div>
@@ -78,7 +224,7 @@
   </div>
 
   <!-- Vote count -->
-  <div class="box" style="text-align: center; padding: 1.5rem; margin-top: 2rem;">
+  <div class="box vote-count-box" style="text-align: center; padding: 1.5rem; margin-top: 2rem;">
     <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em;">
       <strong><%= @game.votes.count %></strong> / <strong><%= @game.active_human_players.count * Vote::MAX_VOTES_PER_PLAYER %></strong> TOTAL VOTES CAST
     </div>
@@ -89,7 +235,7 @@
 
   <!-- Check if voting is complete -->
   <% if @game.voting_complete? %>
-    <div class="box" style="background: #000000; color: #ffffff; padding: 2rem; margin: 2rem 0; text-align: center;">
+    <div class="box voting-complete-box" style="background: #000000; color: #ffffff; padding: 2rem; margin: 2rem 0; text-align: center;">
       <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">
         ■ VOTING COMPLETE
       </div>
@@ -100,7 +246,7 @@
 
 <!-- Voting Modal -->
 <div id="voteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
-  <div class="box" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2.5rem; max-width: 500px; width: 90%;">
+  <div class="box vote-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2.5rem; max-width: 500px; width: 90%;">
     <h3 style="margin: 0 0 1.5rem 0; text-transform: uppercase; text-align: center; font-size: 1.5rem;">■ CONFIRM YOUR VOTE</h3>
     <p style="font-family: 'Courier New', monospace; text-align: center; font-size: 1.1rem; margin-bottom: 2rem;">
       Are you sure you want to vote for<br><strong style="font-size: 1.3rem; text-transform: uppercase;" id="voteName"></strong><br>as the AI?
@@ -108,9 +254,9 @@
 
     <%= form_with url: game_votes_path(@game), method: :post, data: { turbo: false } do |f| %>
       <%= f.hidden_field :voted_for_id, id: "votePlayerId" %>
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+      <div class="vote-modal-buttons" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
         <%= f.submit "YES, VOTE", class: "btn", style: "flex: 1; background: #000000; color: #ffffff; padding: 1rem; font-size: 1rem;" %>
-        <button type="button" onclick="closeVoteModal()" class: "btn" style="flex: 1; background: #ffffff; color: #000000; padding: 1rem; font-size: 1rem; border: 4px solid #000000;">
+        <button type="button" onclick="closeVoteModal()" class="btn" style="flex: 1; background: #ffffff; color: #000000; padding: 1rem; font-size: 1rem; border: 4px solid #000000;">
           CANCEL
         </button>
       </div>
