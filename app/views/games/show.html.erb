@@ -580,9 +580,8 @@
           ► SCORING BREAKDOWN:
         </div>
         <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8;">
-          • Each correct AI identification: <strong>+<%= @game.points_per_correct_guess %> points</strong> (max <%= @game.max_points_from_guesses %> points)<br>
-          • Each vote received as AI (humans only): <strong>+1 point</strong> (fooled other players!)<br>
-          • AIs Found: Shows how many of the 2 AI players you correctly identified
+          • Correct Vote: <strong>+<%= @game.points_per_correct_guess %> points</strong> (max <%= @game.max_points_from_guesses %> points)<br>
+          • Vote received: <strong>+1 points</strong> (fooled other players!)<br>
         </div>
       </div>
     </div>
