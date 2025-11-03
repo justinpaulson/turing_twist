@@ -117,8 +117,8 @@ class GamesController < ApplicationController
     answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
     all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
 
-    # Group answers by player
-    @answers_by_player = all_answers.group_by(&:player)
+    # Group answers by player and randomize the order
+    @answers_by_player = all_answers.group_by(&:player).to_a.shuffle.to_h
 
     @my_votes = @game.votes.where(voter: @current_player)
     @voted_for_ids = @my_votes.pluck(:voted_for_id)
