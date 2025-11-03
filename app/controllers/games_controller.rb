@@ -87,7 +87,7 @@ class GamesController < ApplicationController
       )
 
       # Broadcast update to all players in the waiting room
-      @game.broadcast_refresh
+      @game.broadcast_refresh_to(@game)
 
       redirect_to @game, notice: "You've joined the game!"
     end
