@@ -4,7 +4,25 @@
   @media (max-width: 768px) {
     /* Final Leaderboard - Compact horizontal rows on mobile */
     .leaderboard-header {
+      grid-template-columns: 30px 40px 1fr 45px 45px 55px 40px !important;
+      gap: 0.25rem !important;
+      padding: 0.5rem 0.3rem !important;
+      margin-bottom: 0.5rem !important;
+      border-bottom-width: 2px !important;
+    }
+
+    .leaderboard-header > div {
+      font-size: 0.5rem !important;
+      letter-spacing: 0.02em !important;
+    }
+
+    /* Show short headers on mobile, hide full headers */
+    .header-full {
       display: none !important;
+    }
+
+    .header-short {
+      display: inline !important;
     }
 
     .leaderboard-row {
@@ -402,13 +420,13 @@
 
       <!-- Column Headers -->
       <div class="leaderboard-header" style="display: grid; grid-template-columns: 60px 80px 1fr 120px 120px 120px 100px; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 3px solid #ffffff; margin-bottom: 1rem;">
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">RANK</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">RANK</span><span class="header-short" style="display: none;">RK</span></div>
         <div></div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">PLAYER</div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">AIS FOUND</div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">VOTES RCV'D</div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">SCORE</div>
-        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">STATUS</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;"><span class="header-full">PLAYER</span><span class="header-short" style="display: none;">NAME</span></div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">AIS FOUND</span><span class="header-short" style="display: none;">AIs</span></div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">VOTES RCV'D</span><span class="header-short" style="display: none;">VOTES</span></div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">SCORE</span><span class="header-short" style="display: none;">PTS</span></div>
+        <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;"><span class="header-full">STATUS</span><span class="header-short" style="display: none;">-</span></div>
       </div>
 
       <!-- Human Player Rows -->
