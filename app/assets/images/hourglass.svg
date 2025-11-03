@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="white"/>
+  <!-- Top frame -->
+  <rect x="16" y="12" width="32" height="4" fill="black"/>
+  <!-- Top glass -->
+  <rect x="20" y="16" width="24" height="4" fill="black"/>
+  <rect x="24" y="20" width="16" height="4" fill="black"/>
+  <rect x="28" y="24" width="8" height="4" fill="black"/>
+  <!-- Middle (narrowest point) -->
+  <rect x="30" y="28" width="4" height="8" fill="black"/>
+  <!-- Bottom glass -->
+  <rect x="28" y="36" width="8" height="4" fill="black"/>
+  <rect x="24" y="40" width="16" height="4" fill="black"/>
+  <rect x="20" y="44" width="24" height="4" fill="black"/>
+  <!-- Bottom frame -->
+  <rect x="16" y="48" width="32" height="4" fill="black"/>
+  <!-- Sand in bottom -->
+  <rect x="24" y="40" width="16" height="4" fill="black"/>
+  <rect x="26" y="44" width="12" height="4" fill="black"/>
+</svg>
