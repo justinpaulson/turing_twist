@@ -311,7 +311,11 @@
 
               <!-- Rank -->
               <div style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace;">
-                <%= index == 0 ? '🏆' : "#{index + 1}" %>
+                <% if index == 0 %>
+                  <%= image_tag "trophy.svg", style: "width: 50px; height: 50px; border: 3px solid #000000;" %>
+                <% else %>
+                  <%= index + 1 %>
+                <% end %>
               </div>
 
               <!-- Avatar -->
