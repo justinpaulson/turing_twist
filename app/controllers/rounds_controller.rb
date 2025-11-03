@@ -4,17 +4,17 @@ class RoundsController < ApplicationController
   def show
     @current_player = @game.players.find_by(user: Current.user)
 
+    # Redirect old voting rounds (round 6+) to the voting page
+    if @round.round_number > Game::TOTAL_ROUNDS
+      redirect_to voting_game_path(@game) and return
+    end
+
     # Auto-redirect for completed rounds
     if @round.completed?
-      if @round.round_number <= Game::TOTAL_ROUNDS
-        # For answering rounds (1-5), go to next round
-        next_round = @game.current_round_object
-        if next_round && next_round.id != @round.id
-          redirect_to game_round_path(@game, next_round) and return
-        end
-      else
-        # For completed voting round (6), go straight to final leaderboard
-        redirect_to game_path(@game) and return
+      # For answering rounds (1-5), go to next round
+      next_round = @game.current_round_object
+      if next_round && next_round.id != @round.id
+        redirect_to game_round_path(@game, next_round) and return
       end
     end
 
@@ -24,17 +24,6 @@ class RoundsController < ApplicationController
       @total_players = @game.active_players.count
     elsif @round.reviewing?
       @answers = @round.answers.includes(:player).shuffle
-    elsif @round.voting?
-      # For voting round, show ALL answers from all previous answering rounds
-      # Group by player and show all their answers together
-      answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
-      all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
-
-      # Group answers by player
-      @answers_by_player = all_answers.group_by(&:player)
-
-      @my_votes = @game.votes.where(voter: @current_player)
-      @voted_for_ids = @my_votes.pluck(:voted_for_id)
     elsif @round.completed?
       @answers = @round.answers.includes(:player)
       @votes = @game.votes.includes(:voter, :voted_for)
