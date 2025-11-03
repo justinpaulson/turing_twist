@@ -85,6 +85,10 @@ class GamesController < ApplicationController
         character_name: character[:name],
         character_avatar: character[:avatar]
       )
+
+      # Broadcast update to all players in the waiting room
+      @game.broadcast_refresh
+
       redirect_to @game, notice: "You've joined the game!"
     end
   end
