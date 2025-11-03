@@ -2,27 +2,45 @@
 
 <% if @game.waiting? %>
   <div style="max-width: 800px; margin: 0 auto;">
-    <h2 style="text-align: center; margin-bottom: 3rem;">WAITING FOR PLAYERS...</h2>
+    <!-- Top Navigation and Status -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;">
+      <%= link_to "← BACK", games_path, class: "btn", style: "font-size: clamp(0.8rem, 2vw, 1rem); padding: 0.5rem 1rem; white-space: nowrap;" %>
+
+      <div style="flex: 1; text-align: center; min-width: 200px;">
+        <h2 style="margin: 0; font-size: clamp(1.2rem, 4vw, 2rem); white-space: nowrap;">WAITING FOR PLAYERS...</h2>
+      </div>
+
+      <% if @game.can_start? && @current_player&.is_host %>
+        <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "font-size: clamp(1rem, 2.5vw, 1.3rem); padding: 0.75rem 1.5rem; white-space: nowrap;" %>
+      <% elsif @current_player && !@current_player.is_host %>
+        <div class="box" style="padding: 0.75rem; font-family: 'Courier New', monospace; font-size: clamp(0.7rem, 2vw, 0.9rem); white-space: nowrap;">
+          ⏳ WAITING...
+        </div>
+      <% else %>
+        <!-- Spacer for alignment when neither condition is met -->
+        <div style="width: clamp(80px, 15vw, 200px);"></div>
+      <% end %>
+    </div>
 
     <!-- Character Assignment Display -->
     <% if @current_player %>
       <div class="box" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
-        <div style="display: flex; align-items: stretch; min-height: 300px;">
-          <!-- Character Avatar (Left) -->
-          <div style="flex: 0 0 300px; background: #000000; display: flex; align-items: center; justify-content: center; padding: 2rem; border-right: 4px solid #000000;">
-            <%= image_tag @current_player.character_avatar_path, style: "width: 100%; height: auto; max-width: 250px; display: block;" %>
+        <div style="display: flex; flex-direction: column; align-items: stretch;">
+          <!-- Character Avatar (Top on mobile, Left on desktop) -->
+          <div style="background: #000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+            <%= image_tag @current_player.character_avatar_path, style: "width: 100%; height: auto; max-width: 200px; display: block;" %>
           </div>
 
-          <!-- Character Name (Right) -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; background: #ffffff;">
-            <div style="font-family: 'Courier New', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 1rem; color: #333333;">
+          <!-- Character Name (Bottom on mobile, Right on desktop) -->
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; background: #ffffff;">
+            <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.75rem; color: #333333;">
               ► YOU ARE
             </div>
-            <div style="font-size: 3.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1; text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: clamp(1.5rem, 8vw, 3.5rem); font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; text-align: center; margin-bottom: 1rem; word-break: break-word; max-width: 100%;">
               <%= @current_player.character_name %>
             </div>
-            <div class="box" style="background: #000000; color: #ffffff; text-align: center; padding: 1.5rem; width: 100%;">
-              <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">
+            <div class="box" style="background: #000000; color: #ffffff; text-align: center; padding: 1rem; width: 100%; max-width: 300px;">
+              <div style="font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">
                 ■ IN THIS GAME
               </div>
             </div>
@@ -46,20 +64,20 @@
     <% end %>
 
     <!-- Player Count -->
-    <div class="box" style="text-align: center; padding: 3rem;">
-      <div style="font-family: 'Courier New', monospace; font-size: 5rem; font-weight: bold; margin-bottom: 1rem; letter-spacing: 0.1em;">
+    <div class="box" style="text-align: center; padding: 2rem 1rem;">
+      <div style="font-family: 'Courier New', monospace; font-size: clamp(2.5rem, 12vw, 5rem); font-weight: bold; margin-bottom: 1rem; letter-spacing: 0.05em; white-space: nowrap;">
         <%= @game.players.count %> / <%= Game::MAX_PLAYERS %>
       </div>
-      <div style="font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;">
+      <div style="font-size: clamp(1rem, 3vw, 1.5rem); text-transform: uppercase; letter-spacing: 0.1em;">
         PLAYERS JOINED
       </div>
       <hr class="separator">
       <% if @game.players.count < Game::MIN_PLAYERS %>
-        <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; margin-top: 1.5rem;">
+        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem;">
           ▶ NEED <%= Game::MIN_PLAYERS - @game.players.count %> MORE TO START
         </div>
       <% else %>
-        <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; margin-top: 1.5rem;">
+        <div style="font-family: 'Courier New', monospace; font-size: clamp(0.9rem, 2.5vw, 1.2rem); margin-top: 1.5rem;">
           ■ READY TO START!
         </div>
       <% end %>
@@ -160,19 +178,6 @@
         <% end %>
       </div>
     <% end %>
-
-    <!-- Action Buttons -->
-    <div style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <% if @game.can_start? && @current_player&.is_host %>
-        <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "font-size: 1.3rem; padding: 1rem 3rem;" %>
-      <% elsif @current_player && !@current_player.is_host %>
-        <div class="box" style="padding: 2rem; font-family: 'Courier New', monospace; font-size: 1.1rem;">
-          ⏳ WAITING FOR THE HOST TO START THE GAME...
-        </div>
-      <% end %>
-
-      <%= link_to "← BACK TO GAMES", games_path, class: "btn" %>
-    </div>
 
     <script>
       function initializeWaitingPageFeatures() {
