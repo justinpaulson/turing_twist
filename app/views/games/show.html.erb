@@ -3,22 +3,22 @@
 <% if @game.waiting? %>
   <div style="max-width: 800px; margin: 0 auto;">
     <!-- Top Navigation and Status -->
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;">
-      <%= link_to "← BACK", games_path, class: "btn", style: "font-size: clamp(0.8rem, 2vw, 1rem); padding: 0.5rem 1rem; white-space: nowrap;" %>
+    <div style="display: flex; align-items: stretch; justify-content: space-between; margin-bottom: 2rem; gap: 1rem;">
+      <%= link_to "← BACK", games_path, class: "btn", style: "display: flex; align-items: center; justify-content: center; font-size: 1rem; padding: 0.75rem 1rem; white-space: nowrap;" %>
 
-      <div style="flex: 1; text-align: center; min-width: 200px;">
-        <h2 style="margin: 0; font-size: clamp(1.2rem, 4vw, 2rem); white-space: nowrap;">WAITING FOR PLAYERS...</h2>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0;">
+        <h2 style="margin: 0; font-size: clamp(1rem, 4vw, 1.5rem); white-space: nowrap; text-align: center;">WAITING FOR PLAYERS...</h2>
       </div>
 
       <% if @game.can_start? && @current_player&.is_host %>
-        <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "font-size: clamp(1rem, 2.5vw, 1.3rem); padding: 0.75rem 1.5rem; white-space: nowrap;" %>
+        <%= link_to "START GAME", start_game_path(@game), data: { turbo_method: :post }, class: "btn", style: "display: flex; align-items: center; justify-content: center; font-size: 1rem; padding: 0.75rem 1.5rem; white-space: nowrap;" %>
       <% elsif @current_player && !@current_player.is_host %>
-        <div class="box" style="padding: 0.75rem; font-family: 'Courier New', monospace; font-size: clamp(0.7rem, 2vw, 0.9rem); white-space: nowrap;">
+        <div class="box" style="display: flex; align-items: center; justify-content: center; padding: 0.75rem 1rem; font-family: 'Courier New', monospace; font-size: 0.9rem; white-space: nowrap;">
           ⏳ WAITING...
         </div>
       <% else %>
         <!-- Spacer for alignment when neither condition is met -->
-        <div style="width: clamp(80px, 15vw, 200px);"></div>
+        <div style="min-width: 120px;"></div>
       <% end %>
     </div>
 
