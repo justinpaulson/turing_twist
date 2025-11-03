@@ -133,7 +133,7 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     # Submit a vote
     assert_difference "Vote.count", 1 do
       player.votes_cast.create!(
-        round: voting_round,
+        game: game,
         voted_for: ai_player
       )
     end
@@ -154,7 +154,7 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     player = game.human_players.first
 
     vote = player.votes_cast.build(
-      round: voting_round,
+      game: game,
       voted_for: player
     )
 
@@ -174,12 +174,12 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     other_players = game.active_players.where.not(id: player.id).limit(3)
 
     # Create 2 votes (should succeed)
-    player.votes_cast.create!(round: voting_round, voted_for: other_players[0])
-    player.votes_cast.create!(round: voting_round, voted_for: other_players[1])
+    player.votes_cast.create!(game: game, voted_for: other_players[0])
+    player.votes_cast.create!(game: game, voted_for: other_players[1])
 
     # Try to create a 3rd vote (should fail)
     vote = player.votes_cast.build(
-      round: voting_round,
+      game: game,
       voted_for: other_players[2]
     )
 
@@ -200,11 +200,11 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     ai_player2 = game.ai_players.second
 
     # Human player correctly identifies both AIs
-    human_player.votes_cast.create!(round: voting_round, voted_for: ai_player1)
-    human_player.votes_cast.create!(round: voting_round, voted_for: ai_player2)
+    human_player.votes_cast.create!(game: game, voted_for: ai_player1)
+    human_player.votes_cast.create!(game: game, voted_for: ai_player2)
 
     # Process voting results
-    GameManager.new(game).process_voting_results!(voting_round)
+    GameManager.new(game).process_voting_results!
 
     human_player.reload
     points_per_correct = game.points_per_correct_guess
@@ -226,11 +226,11 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     other_player = game.human_players.third
 
     # Two players vote for human_player1 thinking they're AI
-    human_player2.votes_cast.create!(round: voting_round, voted_for: human_player1)
-    other_player.votes_cast.create!(round: voting_round, voted_for: human_player1)
+    human_player2.votes_cast.create!(game: game, voted_for: human_player1)
+    other_player.votes_cast.create!(game: game, voted_for: human_player1)
 
     # Process voting results
-    GameManager.new(game).process_voting_results!(voting_round)
+    GameManager.new(game).process_voting_results!
 
     human_player1.reload
     # Should get 2 deception points (one per vote received)

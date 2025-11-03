@@ -46,30 +46,6 @@ class RoundTest < ActiveSupport::TestCase
     assert round.all_players_answered?
   end
 
-  test "voting_complete? returns true when all players have voted twice" do
-    game = Game.create!(status: :active, current_round: 6)
-
-    # Add players
-    3.times do |i|
-      user = User.create!(email_address: "player#{i}@example.com", password: "password123", password_confirmation: "password123")
-      character = game.assign_next_character
-      game.players.create!(user: user, character_name: character[:name], character_avatar: character[:avatar])
-    end
-
-    round = game.rounds.create!(round_number: 6, question: "Vote", status: :voting)
-
-    assert_not round.voting_complete?
-
-    # Each player votes twice
-    game.active_players.each do |player|
-      other_players = game.active_players.where.not(id: player.id).limit(2)
-      other_players.each do |voted_for|
-        player.votes_cast.create!(round: round, voted_for: voted_for)
-      end
-    end
-
-    assert round.voting_complete?
-  end
 
   test "to_param returns round_number as string" do
     game = Game.create!(status: :active, current_round: 1)

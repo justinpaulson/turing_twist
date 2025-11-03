@@ -114,4 +114,49 @@ class GameTest < ActiveSupport::TestCase
     # The indices should remain the same
     assert_equal first_indices, game.ai_persona_indices
   end
+
+  test "voting_complete? returns true when all players have voted twice" do
+    game = Game.create!(status: :active, current_round: 6)
+
+    # Add players
+    3.times do |i|
+      user = User.create!(email_address: "player#{i}@example.com", password: "password123", password_confirmation: "password123")
+      character = game.assign_next_character
+      game.players.create!(user: user, character_name: character[:name], character_avatar: character[:avatar])
+    end
+
+    assert_not game.voting_complete?
+
+    # Each player votes twice
+    game.active_players.each do |player|
+      other_players = game.active_players.where.not(id: player.id).limit(2)
+      other_players.each do |voted_for|
+        player.votes_cast.create!(game: game, voted_for: voted_for)
+      end
+    end
+
+    assert game.voting_complete?
+  end
+
+  test "all_rounds_complete? returns true when all rounds are completed" do
+    game = Game.create!(status: :active, current_round: 5)
+
+    # Create 5 completed rounds
+    Game::TOTAL_ROUNDS.times do |i|
+      game.rounds.create!(round_number: i + 1, question: "Question #{i + 1}", status: :completed)
+    end
+
+    assert game.all_rounds_complete?
+  end
+
+  test "all_rounds_complete? returns false when rounds are not completed" do
+    game = Game.create!(status: :active, current_round: 3)
+
+    # Create only 3 rounds
+    3.times do |i|
+      game.rounds.create!(round_number: i + 1, question: "Question #{i + 1}", status: :completed)
+    end
+
+    assert_not game.all_rounds_complete?
+  end
 end
