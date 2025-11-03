@@ -451,7 +451,7 @@
                     <%= player.character_name %>
                   </div>
                   <div class="player-type" style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
-                    ■ <%= player == @current_player ? "YOU" : player.email %>
+                    ■ <%= player == @current_player ? "YOU" : player.user&.email_address %>
                   </div>
                 </div>
               </div>
