@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [ :show, :join, :start ]
+  before_action :set_game, only: [ :show, :join, :start, :voting ]
 
   def index
     # Active games: waiting games that haven't started yet (joinable)
@@ -22,6 +22,12 @@ class GamesController < ApplicationController
     @current_player = @game.players.find_by(user: Current.user)
     @current_round = @game.current_round_object
 
+    # If all rounds complete but game not finished, go to voting
+    if @game.active? && @game.all_rounds_complete? && !@game.completed?
+      redirect_to voting_game_path(@game)
+      return
+    end
+
     # Redirect to the current round if the game is active
     if @game.active? && @current_round
       redirect_to game_round_path(@game, @current_round)
@@ -31,14 +37,6 @@ class GamesController < ApplicationController
     # Calculate detailed stats for completed games
     if @game.completed?
       calculate_player_stats
-    end
-
-    # Otherwise show game status
-    if @current_round&.voting?
-      @answers = @current_round.answers.includes(:player)
-      @my_vote = @current_round.votes.find_by(voter: @current_player)
-    elsif @current_round&.answering?
-      @my_answer = @current_round.answers.find_by(player: @current_player)
     end
   end
 
@@ -100,6 +98,26 @@ class GamesController < ApplicationController
     end
   end
 
+  def voting
+    @current_player = @game.players.find_by(user: Current.user)
+
+    # Redirect if not ready for voting
+    unless @game.all_rounds_complete?
+      redirect_to @game, alert: "Game is not ready for voting yet."
+      return
+    end
+
+    # Get all answers from all rounds to display
+    answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
+    all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
+
+    # Group answers by player
+    @answers_by_player = all_answers.group_by(&:player)
+
+    @my_votes = @game.votes.where(voter: @current_player)
+    @voted_for_ids = @my_votes.pluck(:voted_for_id)
+  end
+
   private
 
   def set_game
@@ -111,17 +129,14 @@ class GamesController < ApplicationController
   end
 
   def calculate_player_stats
-    voting_round = @game.rounds.find_by(round_number: Game::TOTAL_ROUNDS + 1)
-    return unless voting_round
-
     @player_stats = {}
 
     @game.players.each do |player|
       # Get votes this player received
-      votes_received = voting_round.votes.where(voted_for: player).count
+      votes_received = @game.votes.where(voted_for: player).count
 
       # Get votes this player cast
-      votes_cast = voting_round.votes.where(voter: player)
+      votes_cast = @game.votes.where(voter: player)
 
       # Count correct AI identifications
       correct_votes = votes_cast.select { |v| v.voted_for.is_ai? }.count

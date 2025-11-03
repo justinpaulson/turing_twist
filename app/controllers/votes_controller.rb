@@ -3,7 +3,6 @@ class VotesController < ApplicationController
 
   def create
     @current_player = @game.players.find_by(user: Current.user)
-    @current_round = @game.current_round_object
 
     # Only allow voting when all rounds are complete and we're in voting phase
     if @game.all_rounds_complete? && @current_player && !@current_player.is_eliminated?
@@ -18,14 +17,14 @@ class VotesController < ApplicationController
           GameManager.new(@game).process_voting_results!
         end
 
-        # Redirect back to current round
-        redirect_to game_round_path(@game, @current_round)
+        # Redirect back to voting page
+        redirect_to voting_game_path(@game)
       else
-        redirect_to game_round_path(@game, @current_round), alert: vote.errors.full_messages.join(", ")
+        redirect_to voting_game_path(@game), alert: vote.errors.full_messages.join(", ")
       end
     else
-      # If not ready for voting, redirect to current round
-      redirect_to game_round_path(@game, @current_round || @game.rounds.first), alert: "Cannot vote now."
+      # If not ready for voting, redirect to game
+      redirect_to @game, alert: "Cannot vote now."
     end
   end
 

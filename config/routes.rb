@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     member do
       post :join
       post :start
+      get :voting
     end
     resources :rounds, only: [ :show ], param: :round_number do
       member do
