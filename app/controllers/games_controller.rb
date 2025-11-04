@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [ :show, :join, :start, :voting ]
+  before_action :set_game, only: [ :show, :join, :start, :voting, :skip_remaining_votes ]
 
   def index
     # Active games: waiting games that haven't started yet (joinable)
@@ -122,6 +122,27 @@ class GamesController < ApplicationController
 
     @my_votes = @game.votes.where(voter: @current_player)
     @voted_for_ids = @my_votes.pluck(:voted_for_id)
+  end
+
+  def skip_remaining_votes
+    @current_player = @game.players.find_by(user: Current.user)
+
+    # Verify the current user is the host
+    unless @current_player&.is_host?
+      redirect_to voting_game_path(@game), alert: "Only the host can skip remaining votes."
+      return
+    end
+
+    # Verify we're still in voting phase
+    unless @game.all_rounds_complete? && !@game.completed?
+      redirect_to @game, alert: "Cannot skip votes at this time."
+      return
+    end
+
+    # Process voting results and complete the game
+    GameManager.new(@game).process_voting_results!
+
+    redirect_to @game, notice: "Voting complete! Remaining votes were skipped."
   end
 
   private

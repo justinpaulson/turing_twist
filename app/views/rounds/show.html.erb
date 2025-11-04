@@ -83,6 +83,24 @@
       <div style="width: 100%; max-width: 500px; margin: 0 auto; background: #cccccc; height: 16px; border: 3px solid #000000;">
         <div style="width: <%= (@answer_count.to_f / @total_players * 100).to_i %>%; background: #000000; height: 100%; transition: width 0.3s;"></div>
       </div>
+
+      <!-- Host Skip Button - Only show for host after 30 seconds if not all players have answered -->
+      <% if @current_player&.is_host? && @answer_count < @total_players %>
+        <% if @round.started_at && Time.current - @round.started_at >= 30.seconds %>
+          <div style="margin-top: 2rem;">
+            <%= link_to "SKIP TO NEXT ROUND ►", skip_to_reviewing_game_round_path(@game, @round),
+                data: { turbo_method: :post, turbo_confirm: "Are you sure? This will submit blank answers for players who haven't responded." },
+                class: "btn",
+                style: "font-size: 1.1rem; padding: 1rem 2rem;" %>
+            <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 0.75rem; opacity: 0.7;">
+              Host: Skip if players have left the game
+            </div>
+          </div>
+        <% else %>
+          <!-- Hidden div to track when to show the button (via auto-refresh) -->
+          <div id="skipButtonTimer" style="display: none;" data-started-at="<%= @round.started_at.to_i %>"></div>
+        <% end %>
+      <% end %>
     </div>
 
   <% elsif @round.reviewing? %>

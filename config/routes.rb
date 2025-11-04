@@ -7,11 +7,13 @@ Rails.application.routes.draw do
       post :join
       post :start
       get :voting
+      post :skip_remaining_votes
     end
     resources :rounds, only: [ :show ], param: :round_number do
       member do
         post :submit_answer
         post :start_voting
+        post :skip_to_reviewing
       end
     end
     resources :votes, only: [ :create ] do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_003702) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_04_032026) do
   create_table "answers", force: :cascade do |t|
     t.integer "round_id", null: false
     t.integer "player_id", null: false
@@ -30,6 +30,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_003702) do
     t.datetime "updated_at", null: false
     t.json "ai_persona_indices"
     t.string "password"
+    t.datetime "voting_started_at"
   end
 
   create_table "players", force: :cascade do |t|

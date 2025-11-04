@@ -173,6 +173,24 @@
           Waiting for other players to vote...
         </div>
       <% end %>
+
+      <!-- Host Skip Button - Only show for host after 2 minutes if voting is not complete -->
+      <% if @current_player&.is_host? && !@game.voting_complete? %>
+        <% if @game.voting_started_at && Time.current - @game.voting_started_at >= 2.minutes %>
+          <% border_color = @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#ffffff' : '#000000' %>
+          <% button_bg = @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#ffffff' : '#000000' %>
+          <% button_color = @my_votes.count >= Vote::MAX_VOTES_PER_PLAYER ? '#000000' : '#ffffff' %>
+          <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid <%= border_color %>;">
+            <%= link_to "SKIP REMAINING VOTES ►", skip_remaining_votes_game_path(@game),
+                data: { turbo_method: :post, turbo_confirm: "Are you sure? This will complete voting and calculate scores without remaining votes." },
+                class: "btn",
+                style: "font-size: 1.1rem; padding: 1rem 2rem; background: #{button_bg}; color: #{button_color};" %>
+            <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 0.75rem; opacity: 0.7;">
+              Host: Skip if players have left the game
+            </div>
+          </div>
+        <% end %>
+      <% end %>
     </div>
   <% end %>
 

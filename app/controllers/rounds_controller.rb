@@ -69,6 +69,8 @@ class RoundsController < ApplicationController
 
       # If this was the last answering round, go to voting page
       if @round.round_number >= Game::TOTAL_ROUNDS
+        # Set voting started timestamp
+        @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
         redirect_to voting_game_path(@game), notice: "All questions answered! Time to vote!"
       else
         # Create next answering round
@@ -78,6 +80,40 @@ class RoundsController < ApplicationController
     else
       redirect_to game_round_path(@game, @round), alert: "Not ready to start voting."
     end
+  end
+
+  def skip_to_reviewing
+    @current_player = @game.players.find_by(user: Current.user)
+
+    # Verify the current user is the host
+    unless @current_player&.is_host?
+      redirect_to game_round_path(@game, @round), alert: "Only the host can skip to the next round."
+      return
+    end
+
+    # Verify the round is in the answering phase
+    unless @round.answering?
+      redirect_to game_round_path(@game, @round), alert: "Cannot skip this round."
+      return
+    end
+
+    # Create blank answers for any human players who haven't responded
+    active_human_players = @game.active_human_players
+    players_who_answered = @round.answers.where(player: active_human_players).pluck(:player_id)
+    players_who_need_answers = active_human_players.where.not(id: players_who_answered)
+
+    players_who_need_answers.each do |player|
+      @round.answers.create!(
+        player: player,
+        content: "(no response)",
+        submitted_at: Time.current
+      )
+    end
+
+    # Transition to reviewing phase
+    @round.update!(status: :reviewing)
+
+    redirect_to game_round_path(@game, @round), notice: "Skipped to reviewing phase."
   end
 
   private
