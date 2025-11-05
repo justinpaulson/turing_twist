@@ -9,7 +9,7 @@ class Game < ApplicationRecord
   enum :status, { waiting: 0, active: 1, completed: 2 }
 
   MIN_PLAYERS = 5
-  MAX_PLAYERS = 8
+  MAX_PLAYERS = 10
   AI_PLAYERS_COUNT = 2
   TOTAL_ROUNDS = 5
 
@@ -74,7 +74,13 @@ class Game < ApplicationRecord
   end
 
   def points_per_correct_guess
-    players.count <= 6 ? 2 : 3
+    if players.count <= 6
+      2
+    elsif players.count <= 8
+      3
+    else
+      4
+    end
   end
 
   def max_points_from_guesses

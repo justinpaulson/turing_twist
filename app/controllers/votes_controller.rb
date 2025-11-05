@@ -4,6 +4,12 @@ class VotesController < ApplicationController
   def create
     @current_player = @game.players.find_by(user: Current.user)
 
+    # If game is completed or voting is complete, redirect to results
+    if @game.completed? || @game.voting_complete?
+      redirect_to @game, alert: "Voting has ended."
+      return
+    end
+
     # Only allow voting when all rounds are complete and we're in voting phase
     if @game.all_rounds_complete? && @current_player && !@current_player.is_eliminated?
       vote = @current_player.votes_cast.build(
@@ -17,8 +23,12 @@ class VotesController < ApplicationController
           GameManager.new(@game).process_voting_results!
         end
 
-        # Redirect back to voting page
-        redirect_to voting_game_path(@game)
+        # Redirect back to voting page or to results if complete
+        if @game.completed?
+          redirect_to @game
+        else
+          redirect_to voting_game_path(@game)
+        end
       else
         redirect_to voting_game_path(@game), alert: vote.errors.full_messages.join(", ")
       end

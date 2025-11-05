@@ -46,6 +46,11 @@
         color: #ffffff;
         font-size: 0.9rem;
         line-height: 1;
+        text-decoration: none;
+        transition: opacity 0.2s;
+      }
+      .header-email:hover {
+        opacity: 0.8;
       }
       .header-nav {
         display: flex;
@@ -66,8 +71,8 @@
         box-sizing: border-box;
       }
       @media (max-width: 768px) {
-        .header-email {
-          display: none;
+        .header-sign-out {
+          display: none !important;
         }
         .header-container h1 {
           font-size: 1.25rem !important;
@@ -88,10 +93,8 @@
         </h1>
         <nav class="header-nav">
           <% if authenticated? %>
-            <span class="header-email">
-              <%= Current.user.email_address %>
-            </span>
-            <%= link_to "SIGN OUT", session_path, data: { turbo_method: :delete }, class: "header-button" %>
+            <%= link_to Current.user.display_name || Current.user.email_address, edit_profile_path, class: "header-email" %>
+            <%= link_to "SIGN OUT", session_path, data: { turbo_method: :delete }, class: "header-button header-sign-out" %>
           <% else %>
             <%= link_to "SIGN IN", new_session_path, class: "header-button" %>
           <% end %>

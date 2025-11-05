@@ -468,7 +468,7 @@
               <!-- Rank + Avatar + Name (grouped for mobile) -->
               <div style="display: contents;">
                 <!-- Rank -->
-                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace;">
+                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center;">
                   <% if index == 0 %>
                     <%= image_tag "trophy.svg", class: "trophy-icon", style: "width: 50px; height: 50px; border: 3px solid #000000;" %>
                   <% else %>
@@ -527,10 +527,10 @@
 
             </div>
 
-            <!-- Email Subrow -->
+            <!-- Display Name Subrow -->
             <div class="player-email-subrow clickable-row" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.05); border: 2px solid rgba(0,0,0,0.1); cursor: pointer;">
               <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
-                ■ <%= player == @current_player ? "YOU" : player.user&.email_address %>
+                ■ <%= player == @current_player ? "YOU" : (player.user&.display_name || player.user&.email_address) %>
               </div>
             </div>
 
@@ -574,7 +574,7 @@
               <!-- Rank + Avatar + Name -->
               <div style="display: contents;">
                 <!-- No Rank (just dash) -->
-                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace; opacity: 0.5;">
+                <div class="rank-cell" style="font-size: 2rem; font-weight: bold; text-align: center; font-family: 'Courier New', monospace; opacity: 0.5; display: flex; align-items: center; justify-content: center;">
                   —
                 </div>
 

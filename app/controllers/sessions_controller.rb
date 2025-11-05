@@ -22,7 +22,8 @@ class SessionsController < ApplicationController
       user = User.new(
         email_address: email,
         password: password,
-        password_confirmation: password
+        password_confirmation: password,
+        display_name: DisplayNameGenerator.generate
       )
 
       if user.save

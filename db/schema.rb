@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_04_032026) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_05_193510) do
   create_table "answers", force: :cascade do |t|
     t.integer "round_id", null: false
     t.integer "player_id", null: false
@@ -196,6 +196,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_032026) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "display_name"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

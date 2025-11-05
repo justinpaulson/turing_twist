@@ -135,12 +135,13 @@ bundle exec brakeman
 ## Game Rules
 
 - **Minimum Players**: 5 (including 2 AI)
-- **Maximum Players**: 8 (including 2 AI)
+- **Maximum Players**: 10 (including 2 AI)
 - **AI Players**: Always 2 per game
 - **Total Rounds**: 5 rounds per game
 - **Scoring**:
   - 5-6 players: 2 points per correct AI guess (max 4 points/round)
   - 7-8 players: 3 points per correct AI guess (max 6 points/round)
+  - 9-10 players: 4 points per correct AI guess (max 8 points/round)
   - 1 point for each vote received as an AI (humans only - deception bonus!)
 - **Victory**: Player with the highest score after 5 rounds wins
 

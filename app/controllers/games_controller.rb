@@ -107,24 +107,32 @@ class GamesController < ApplicationController
       return
     end
 
-    # If voting is complete, redirect to final results
-    if @game.voting_complete?
-      redirect_to @game
+    # If game is completed or voting is complete, redirect to final results
+    if @game.completed? || @game.voting_complete?
+      respond_to do |format|
+        format.html { redirect_to @game }
+        format.json { render json: { voting_complete: true, game_completed: @game.completed? } }
+      end
       return
     end
 
     # Set voting started timestamp if not already set
     @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
 
-    # Get all answers from all rounds to display
-    answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
-    all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
+    respond_to do |format|
+      format.html do
+        # Get all answers from all rounds to display
+        answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
+        all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
 
-    # Group answers by player and randomize the order
-    @answers_by_player = all_answers.group_by(&:player).to_a.shuffle.to_h
+        # Group answers by player and randomize the order
+        @answers_by_player = all_answers.group_by(&:player).to_a.shuffle.to_h
 
-    @my_votes = @game.votes.where(voter: @current_player)
-    @voted_for_ids = @my_votes.pluck(:voted_for_id)
+        @my_votes = @game.votes.where(voter: @current_player)
+        @voted_for_ids = @my_votes.pluck(:voted_for_id)
+      end
+      format.json { render json: { voting_complete: false, game_completed: false } }
+    end
   end
 
   def skip_remaining_votes

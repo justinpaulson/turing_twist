@@ -303,4 +303,34 @@ function openVoteModal(playerId, playerName) {
 function closeVoteModal() {
   document.getElementById('voteModal').style.display = 'none';
 }
+
+// Check if voting is complete and redirect to results
+<% unless @game.completed? || @game.voting_complete? %>
+  function checkVotingStatus() {
+    fetch('<%= voting_game_path(@game) %>', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.voting_complete || data.game_completed) {
+        // Stop polling and redirect to results
+        if (window.pollInterval) {
+          clearInterval(window.pollInterval);
+        }
+        window.location.href = '<%= game_path(@game) %>';
+      }
+    })
+    .catch(error => {
+      console.error('Error checking voting status:', error);
+    });
+  }
+
+  // Check immediately on page load
+  checkVotingStatus();
+
+  // Poll every 3 seconds to detect when host skips remaining votes
+  window.pollInterval = setInterval(checkVotingStatus, 3000);
+<% end %>
 </script>

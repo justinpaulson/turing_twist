@@ -16,7 +16,9 @@ class Player < ApplicationRecord
     { name: "The Archer", avatar: "archer.svg" },
     { name: "The Priest", avatar: "priest.svg" },
     { name: "The Barbarian", avatar: "barbarian.svg" },
-    { name: "The Scholar", avatar: "scholar.svg" }
+    { name: "The Scholar", avatar: "scholar.svg" },
+    { name: "The Paladin", avatar: "paladin.svg" },
+    { name: "The Bard", avatar: "bard.svg" }
   ].freeze
 
   def name

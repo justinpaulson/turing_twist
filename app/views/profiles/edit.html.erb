@@ -1,0 +1,177 @@
+<style>
+  .profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .profile-box {
+    background: #ffffff;
+    border: 4px solid #000000;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .profile-header {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 4px solid #000000;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 3px solid #000000;
+    background: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus {
+    outline: none;
+    background: #f0f0f0;
+  }
+
+  .form-hint {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+  }
+
+  .btn-primary {
+    background: #000000;
+    color: #ffffff;
+    border: 3px solid #000000;
+    padding: 1rem 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .btn-primary:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .btn-danger {
+    background: #ffffff;
+    color: #000000;
+    border: 3px solid #000000;
+    padding: 1rem 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    width: 100%;
+    margin-top: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .btn-danger:hover {
+    background: #000000;
+    color: #ffffff;
+  }
+
+  .separator {
+    border: none;
+    border-top: 4px solid #000000;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .profile-box {
+      padding: 1rem;
+    }
+
+    .profile-header {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="profile-container">
+  <div class="profile-box">
+    <h1 class="profile-header">Edit Profile</h1>
+
+    <% if @user.errors.any? %>
+      <div style="background: #ffffff; border: 3px solid #000000; padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="font-family: 'Courier New', monospace; font-weight: bold; margin-bottom: 0.5rem;">
+          ⚠ <%= pluralize(@user.errors.count, "error") %> prevented this profile from being saved:
+        </div>
+        <ul style="font-family: 'Courier New', monospace; margin: 0; padding-left: 1.5rem;">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: profile_path, method: :patch, local: true do |f| %>
+      <div class="form-group">
+        <%= f.label :display_name, "Display Name", class: "form-label" %>
+        <%= f.text_field :display_name, class: "form-input", placeholder: "Enter your display name" %>
+        <div class="form-hint">► This is how other players will see you in games</div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :email_address, "Email Address", class: "form-label" %>
+        <%= f.email_field :email_address, class: "form-input", placeholder: "your@email.com" %>
+        <div class="form-hint">► Used for signing in</div>
+      </div>
+
+      <hr class="separator">
+
+      <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.8;">
+        ► Leave password fields blank to keep your current password
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password, "New Password", class: "form-label" %>
+        <%= f.password_field :password, class: "form-input", placeholder: "Enter new password (optional)" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password_confirmation, "Confirm New Password", class: "form-label" %>
+        <%= f.password_field :password_confirmation, class: "form-input", placeholder: "Confirm new password" %>
+      </div>
+
+      <%= f.submit "Save Changes", class: "btn-primary" %>
+    <% end %>
+  </div>
+
+  <div class="profile-box">
+    <h2 style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; margin-bottom: 1rem;">
+      Account Actions
+    </h2>
+    <%= link_to "← Back to Games", root_path, class: "btn-danger", style: "margin-bottom: 0.5rem;" %>
+    <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, class: "btn-danger", style: "margin-top: 0.5rem;" %>
+  </div>
+</div>
