@@ -113,6 +113,9 @@ class GamesController < ApplicationController
       return
     end
 
+    # Set voting started timestamp if not already set
+    @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
+
     # Get all answers from all rounds to display
     answering_rounds = @game.rounds.where("round_number <= ?", Game::TOTAL_ROUNDS)
     all_answers = Answer.where(round: answering_rounds).includes(:player, :round).order("rounds.round_number")
