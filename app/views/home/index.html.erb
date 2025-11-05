@@ -11,6 +11,10 @@
     display: none;
   }
 
+  .mobile-hide {
+    display: inline;
+  }
+
   @media (max-width: 768px) {
     .home-container {
       padding: 0 0.5rem;
@@ -32,6 +36,10 @@
 
     .mobile-break {
       display: inline;
+    }
+
+    .mobile-hide {
+      display: none;
     }
 
     .home-main-story,
@@ -68,7 +76,7 @@
       </p>
     </div>
     <div class="subtitle" style="font-family: 'Courier New', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
-      Vol. 1 &nbsp;|&nbsp; Est. 2025<br class="mobile-break"> &nbsp;|&nbsp; Players: <%= User.count %> &nbsp;|&nbsp; Games: <%= Game.count %>
+      Vol. 1 &nbsp;|&nbsp; Est. 2025<span class="mobile-hide"> &nbsp;|&nbsp;</span><br class="mobile-break">Players: <%= User.count %> &nbsp;|&nbsp; Games: <%= Game.count %>
     </div>
   </div>
 
