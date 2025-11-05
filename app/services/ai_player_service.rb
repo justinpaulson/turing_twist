@@ -21,7 +21,7 @@ class AiPlayerService
     chat = RubyLLM.chat
     prompt.each { |msg| chat.add_message(role: msg[:role], content: msg[:content]) }
     # Use higher temperature for more diverse, creative answers
-    response = chat.complete(temperature: 1.2)
+    response = chat.with_temperature(1.2).complete
 
     player.answers.create!(
       round: round,
