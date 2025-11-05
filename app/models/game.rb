@@ -113,8 +113,8 @@ class Game < ApplicationRecord
       # 5. The Minimalist
       "Minimal words. Short. Direct. No extra details. Just answer the question.",
 
-      # 6. The Meta-Gamer
-      "Joke about being an AI/bot as reverse psychology. Make meta references. Be playfully self-aware about the game."
+      # 6. The Storyteller
+      "Give brief personal anecdotes or references. Make it feel like you're drawing from real experience. Use 'I' statements and personal touches."
     ]
 
     # Store selected personas for this game if not already set
