@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
-  resource :profile, only: [:edit, :update]
+  resource :profile, only: [ :edit, :update ]
 
   resources :games do
     member do
