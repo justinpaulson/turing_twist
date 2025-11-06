@@ -50,7 +50,7 @@ The twist? There are always 2 AI players in the mix, powered by LLM technology, 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/turing_twist.git
+git clone https://github.com/justinpaulson/turing_twist.git
 cd turing_twist
 ```
 
