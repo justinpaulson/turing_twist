@@ -8,6 +8,14 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# Open Graph meta tags for link sharing %>
+    <meta property="og:title" content="<%= content_for(:title) || "Turing Twist" %>">
+    <meta property="og:description" content="A retro-style party game inspired by classic Nintendo and newspaper aesthetics">
+    <meta property="og:image" content="<%= asset_url('favicon.png') %>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= request.original_url %>">
+
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
