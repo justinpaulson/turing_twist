@@ -91,10 +91,10 @@ bin/dev
 ```
 
 This will start:
-- Rails server on port 3077
+- Rails server on port 3069
 - Solid Queue background jobs worker (for AI player actions)
 
-Visit `http://localhost:3077` to play!
+Visit `http://localhost:3069` to play!
 
 **Note**: Running just `rails server` will NOT work properly - AI players won't answer or vote without the background jobs worker running.
 
