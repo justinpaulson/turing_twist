@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="white"/>
+  <!-- Assassin hood (deep shadow) -->
+  <rect x="16" y="8" width="32" height="12" fill="black"/>
+  <!-- Face mask -->
+  <rect x="20" y="20" width="24" height="8" fill="black"/>
+  <!-- Eye slit -->
+  <rect x="22" y="22" width="20" height="4" fill="white"/>
+  <!-- Eyes visible through slit -->
+  <rect x="24" y="23" width="4" height="2" fill="black"/>
+  <rect x="36" y="23" width="4" height="2" fill="black"/>
+  <!-- Lower face cover -->
+  <rect x="20" y="28" width="24" height="12" fill="black"/>
+  <!-- Cloak collar -->
+  <rect x="12" y="40" width="40" height="4" fill="black"/>
+  <!-- Body/cloak -->
+  <rect x="16" y="44" width="32" height="12" fill="black"/>
+  <!-- Daggers on belt -->
+  <rect x="8" y="48" width="8" height="2" fill="black"/>
+  <rect x="10" y="46" width="2" height="6" fill="black"/>
+  <rect x="48" y="48" width="8" height="2" fill="black"/>
+  <rect x="52" y="46" width="2" height="6" fill="black"/>
+  <!-- Lower cloak -->
+  <rect x="20" y="56" width="24" height="8" fill="black"/>
+</svg>
