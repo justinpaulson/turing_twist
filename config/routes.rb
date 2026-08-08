@@ -1,4 +1,29 @@
 Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      resource :session, only: [ :create, :destroy ]
+      resource :profile, only: [ :show, :update ]
+
+      resources :games, only: [ :index, :create, :show ] do
+        member do
+          post :join
+          post :start
+          post :skip_remaining_votes
+        end
+
+        resources :rounds, only: [], param: :round_number do
+          member do
+            post :answer
+            post :advance
+            post :skip_to_reviewing
+          end
+        end
+
+        resources :votes, only: [ :create ]
+      end
+    end
+  end
+
   resource :session
   resources :passwords, param: :token
   resource :profile, only: [ :edit, :update ]

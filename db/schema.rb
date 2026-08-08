@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_05_193510) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_07_000000) do
   create_table "answers", force: :cascade do |t|
     t.integer "round_id", null: false
     t.integer "player_id", null: false
@@ -67,6 +67,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_05_193510) do
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "api_token_digest"
+    t.index ["api_token_digest"], name: "index_sessions_on_api_token_digest", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 

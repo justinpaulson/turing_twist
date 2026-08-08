@@ -37,6 +37,21 @@ The twist? There are always 2 AI players in the mix, powered by LLM technology, 
 - **AI Integration** ruby_llm gem
 - **Authentication** Rails built-in authentication with bcrypt
 - **Deployment** Docker-ready with Kamal support
+- **iOS** Native SwiftUI app for iPhone and iPad
+
+## iPhone and iPad App
+
+The native SwiftUI client lives in [`ios/TuringTwist.xcodeproj`](ios/TuringTwist.xcodeproj). It mirrors the web game flow—account creation and sign-in, public and private games, waiting rooms, five answer/review rounds, final AI voting, live state refresh, results, and profile editing—while preserving the black-and-white newspaper and retro pixel-art aesthetic.
+
+The checked-in configuration targets iOS 17 or newer and connects to `https://turing.justinpaulson.com/api/v1`. To run against a local Rails server, add the `TURING_TWIST_API_URL` environment variable to the Xcode scheme with a value such as `http://localhost:3069/api/v1`.
+
+Before using the native app against a deployment, run the new session-token migration:
+
+```bash
+bin/rails db:migrate
+```
+
+Then open the Xcode project, select the `TuringTwist` scheme, and run on any iPhone or iPad simulator. The app uses Keychain for its bearer token and never stores the account password.
 
 ## Prerequisites
 

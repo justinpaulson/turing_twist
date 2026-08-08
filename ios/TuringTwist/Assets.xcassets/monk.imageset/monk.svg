@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="white"/>
+  <!-- Monk hood -->
+  <rect x="16" y="8" width="32" height="4" fill="black"/>
+  <rect x="12" y="12" width="40" height="8" fill="black"/>
+  <!-- Hood opening for face -->
+  <rect x="20" y="20" width="24" height="20" fill="white"/>
+  <rect x="19" y="20" width="26" height="20" fill="none" stroke="black" stroke-width="2"/>
+  <!-- Eyes (closed/meditative) -->
+  <rect x="24" y="28" width="8" height="2" fill="black"/>
+  <rect x="32" y="28" width="8" height="2" fill="black"/>
+  <!-- Nose -->
+  <rect x="30" y="32" width="4" height="4" fill="black"/>
+  <!-- Robe collar -->
+  <rect x="16" y="40" width="32" height="4" fill="black"/>
+  <!-- Robe body -->
+  <rect x="12" y="44" width="40" height="8" fill="black"/>
+  <!-- Prayer beads -->
+  <rect x="28" y="52" width="8" height="4" fill="black"/>
+  <rect x="26" y="56" width="4" height="4" fill="black"/>
+  <rect x="34" y="56" width="4" height="4" fill="black"/>
+  <rect x="30" y="60" width="4" height="4" fill="black"/>
+</svg>

@@ -1,0 +1,6 @@
+{
+  "images" : [
+    { "filename" : "barbarian.svg", "idiom" : "universal" }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}
