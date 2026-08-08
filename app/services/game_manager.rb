@@ -16,6 +16,13 @@ class GameManager
     true
   end
 
+  def begin_voting!
+    return if game.voting_started_at
+
+    game.update!(voting_started_at: Time.current)
+    CollectVirtualVotesJob.perform_later(game) if game.active_virtual_players.exists?
+  end
+
   def create_next_round!
     return if game.completed?
 
@@ -31,7 +38,7 @@ class GameManager
 
       round = game.rounds.create!(
         round_number: game.current_round,
-        question: Round.generate_question(game),
+        question: game.question_for_round(game.current_round),
         status: :answering,
         started_at: Time.current
       )
@@ -56,7 +63,7 @@ class GameManager
   def create_first_round!
     game.rounds.create!(
       round_number: 1,
-      question: Round.generate_question(game),
+      question: game.question_for_round(1),
       status: :answering,
       started_at: Time.current
     ).tap do |round|

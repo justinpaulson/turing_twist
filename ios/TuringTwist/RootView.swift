@@ -18,22 +18,9 @@ struct RootView: View {
             } else if session.token == nil {
                 SignInView()
             } else {
-                MainShellView()
+                GamesView()
             }
         }
         .tint(Newsprint.ink)
-    }
-}
-
-private struct MainShellView: View {
-    var body: some View {
-        TabView {
-            GamesView()
-                .tabItem { Label("Games", systemImage: "checkerboard.rectangle") }
-            ProfileView()
-                .tabItem { Label("Profile", systemImage: "person.crop.square") }
-        }
-        .toolbarBackground(Newsprint.paper, for: .tabBar)
-        .toolbarBackground(.visible, for: .tabBar)
     }
 }

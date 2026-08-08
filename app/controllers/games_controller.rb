@@ -60,6 +60,8 @@ class GamesController < ApplicationController
       # Add AI players
       @game.add_ai_players!
 
+      FillWaitingGameJob.set(wait: Game::SOLO_FALLBACK_DELAY).perform_later(@game)
+
       redirect_to @game, notice: "Game created! Waiting for more players..."
     else
       render :new
@@ -67,25 +69,28 @@ class GamesController < ApplicationController
   end
 
   def join
-    # Check if user is already in the game
-    existing_player = @game.players.find_by(user: Current.user)
+    @game.with_lock do
+      # Recheck every condition while holding the game lock so the historical
+      # fallback cannot start between the eligibility check and player creation.
+      existing_player = @game.players.find_by(user: Current.user)
 
-    if existing_player
-      redirect_to @game, notice: "You're already in this game!"
-    elsif @game.players.count >= Game::MAX_PLAYERS
-      redirect_to games_path, alert: "Game is full!"
-    elsif @game.active? || @game.completed?
-      redirect_to games_path, alert: "Game has already started!"
-    elsif @game.private? && !@game.valid_password?(params[:password])
-      redirect_to games_path, alert: "Incorrect password!"
-    else
-      character = @game.assign_next_character
-      @game.players.create!(
-        user: Current.user,
-        character_name: character[:name],
-        character_avatar: character[:avatar]
-      )
-      redirect_to @game, notice: "You've joined the game!"
+      if existing_player
+        redirect_to @game, notice: "You're already in this game!"
+      elsif @game.players.count >= Game::MAX_PLAYERS
+        redirect_to games_path, alert: "Game is full!"
+      elsif @game.active? || @game.completed?
+        redirect_to games_path, alert: "Game has already started!"
+      elsif @game.private? && !@game.valid_password?(params[:password])
+        redirect_to games_path, alert: "Incorrect password!"
+      else
+        character = @game.assign_next_character
+        @game.players.create!(
+          user: Current.user,
+          character_name: character[:name],
+          character_avatar: character[:avatar]
+        )
+        redirect_to @game, notice: "You've joined the game!"
+      end
     end
   end
 
@@ -117,7 +122,7 @@ class GamesController < ApplicationController
     end
 
     # Set voting started timestamp if not already set
-    @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
+    GameManager.new(@game).begin_voting!
 
     respond_to do |format|
       format.html do

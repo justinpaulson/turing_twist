@@ -40,6 +40,7 @@ struct SignInView: View {
                             Text("PASSWORD").font(Newsprint.mono(12, weight: .bold))
                             SecureField("Password", text: $password)
                                 .textContentType(.password)
+                                .textInputAutocapitalization(.never)
                                 .newsprintField()
                         }
 

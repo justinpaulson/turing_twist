@@ -2,15 +2,17 @@ import SwiftUI
 
 struct GamesView: View {
     @EnvironmentObject private var session: SessionStore
+    @EnvironmentObject private var deepLinks: DeepLinkRouter
     @State private var activeGames: [GameSummary] = []
     @State private var myGames: [GameSummary] = []
     @State private var selectedTab = 0
-    @State private var path: [Int] = []
+    @State private var path: [AppRoute] = []
     @State private var isLoading = true
     @State private var isCreating = false
     @State private var errorMessage: String?
     @State private var showingCreateGame = false
     @State private var showingJoinGame = false
+    @State private var invitedGameID: Int?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -18,7 +20,12 @@ struct GamesView: View {
                 HalftoneBackground()
                 ScrollView {
                     LazyVStack(spacing: 18) {
-                        Masthead(compact: true)
+                        HStack(alignment: .top, spacing: 12) {
+                            Masthead(compact: true)
+                            ProfileLinkButton(user: session.user) {
+                                if path.last != .profile { path.append(.profile) }
+                            }
+                        }
                         SectionHeadline(title: "AI Detection Game")
 
                         Text("Join a game where humans and AIs answer questions, then decide who's real and who's artificial.")
@@ -31,13 +38,13 @@ struct GamesView: View {
                             HStack(spacing: 14) {
                                 Button("+ CREATE GAME") { showingCreateGame = true }
                                     .buttonStyle(PixelButtonStyle(filled: true))
-                                Button("► JOIN BY NUMBER") { showingJoinGame = true }
+                                Button("► JOIN BY NUMBER") { showJoinSheet() }
                                     .buttonStyle(PixelButtonStyle())
                             }
                             VStack(spacing: 14) {
                                 Button("+ CREATE GAME") { showingCreateGame = true }
                                     .buttonStyle(PixelButtonStyle(filled: true))
-                                Button("► JOIN BY NUMBER") { showingJoinGame = true }
+                                Button("► JOIN BY NUMBER") { showJoinSheet() }
                                     .buttonStyle(PixelButtonStyle())
                             }
                         }
@@ -56,23 +63,35 @@ struct GamesView: View {
                 }
                 .refreshable { await loadGames() }
             }
-            .navigationBarHidden(true)
-            .navigationDestination(for: Int.self) { gameID in
-                GameDetailView(gameID: gameID)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: AppRoute.self) { route in
+                switch route {
+                case .game(let gameID):
+                    GameDetailView(gameID: gameID)
+                case .profile:
+                    ProfileView()
+                }
             }
             .sheet(isPresented: $showingCreateGame) {
                 CreateGameSheet(isCreating: $isCreating) { password in
                     await createGame(password: password)
                 }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
             }
-            .sheet(isPresented: $showingJoinGame) {
-                JoinGameSheet { gameID, password in
+            .sheet(isPresented: $showingJoinGame, onDismiss: { invitedGameID = nil }) {
+                JoinGameSheet(initialGameID: invitedGameID) { gameID, password in
                     await join(gameID: gameID, password: password)
                 }
+                .id(invitedGameID)
                 .presentationDetents([.medium])
             }
-            .task { await loadGames() }
+            .task {
+                await loadGames()
+                openPendingGameLink()
+            }
+            .onChange(of: deepLinks.revision) { _, _ in
+                if !isLoading { openPendingGameLink() }
+            }
         }
     }
 
@@ -119,7 +138,7 @@ struct GamesView: View {
                     GameCard(game: game, isMine: selectedTab == 1) {
                         Task {
                             if game.isMember {
-                                path.append(game.id)
+                                path.append(.game(game.id))
                             } else {
                                 await join(game)
                             }
@@ -143,6 +162,25 @@ struct GamesView: View {
         isLoading = false
     }
 
+    private func showJoinSheet() {
+        invitedGameID = nil
+        showingJoinGame = true
+    }
+
+    private func openPendingGameLink() {
+        guard let gameID = deepLinks.consumeGameID() else { return }
+
+        showingCreateGame = false
+        if myGames.contains(where: { $0.id == gameID }) {
+            showingJoinGame = false
+            invitedGameID = nil
+            if path.last != .game(gameID) { path = [ .game(gameID) ] }
+        } else {
+            invitedGameID = gameID
+            showingJoinGame = true
+        }
+    }
+
     private func join(_ game: GameSummary) async {
         _ = await join(gameID: game.id, password: nil)
     }
@@ -153,7 +191,7 @@ struct GamesView: View {
             _ = try await APIClient.shared.joinGame(id: gameID, password: password, token: token)
             showingJoinGame = false
             await loadGames()
-            path.append(gameID)
+            path.append(.game(gameID))
             return true
         } catch {
             errorMessage = error.localizedDescription
@@ -169,7 +207,7 @@ struct GamesView: View {
             let game = try await APIClient.shared.createGame(password: password, token: token)
             showingCreateGame = false
             await loadGames()
-            path.append(game.id)
+            path.append(.game(game.id))
             return true
         } catch {
             errorMessage = error.localizedDescription
@@ -178,13 +216,23 @@ struct GamesView: View {
     }
 }
 
+private enum AppRoute: Hashable {
+    case game(Int)
+    case profile
+}
+
 private struct JoinGameSheet: View {
     @Environment(\.dismiss) private var dismiss
     let join: (Int, String?) async -> Bool
-    @State private var gameNumber = ""
+    @State private var gameNumber: String
     @State private var password = ""
     @State private var isJoining = false
     @State private var errorMessage: String?
+
+    init(initialGameID: Int? = nil, join: @escaping (Int, String?) async -> Bool) {
+        self.join = join
+        _gameNumber = State(initialValue: initialGameID.map { String($0) } ?? "")
+    }
 
     var body: some View {
         ZStack {
@@ -199,6 +247,7 @@ private struct JoinGameSheet: View {
                     .keyboardType(.numberPad)
                     .newsprintField()
                 SecureField("Password (if required)", text: $password)
+                    .textInputAutocapitalization(.never)
                     .newsprintField()
                 Button(isJoining ? "JOINING…" : "JOIN GAME") {
                     Task { await performJoin() }
@@ -296,27 +345,49 @@ private struct CreateGameSheet: View {
                             .tint(Newsprint.ink)
                         if isPrivate {
                             SecureField("Game password", text: $password)
+                                .textInputAutocapitalization(.never)
                                 .newsprintField()
                             Text("PLAYERS WILL NEED THIS PASSWORD TO JOIN.")
                                 .font(Newsprint.mono(10))
                         }
                     }
                     .newsprintCard()
-
-                    Button(isCreating ? "CREATING…" : "CREATE GAME") {
-                        Task { _ = await create(isPrivate ? password : nil) }
-                    }
-                    .buttonStyle(PixelButtonStyle(filled: true))
-                    .disabled(isCreating || (isPrivate && password.isEmpty))
-                    .opacity(isCreating || (isPrivate && password.isEmpty) ? 0.5 : 1)
-
-                    Button("CANCEL") { dismiss() }
-                        .buttonStyle(PixelButtonStyle())
                 }
                 .padding(20)
                 .frame(maxWidth: 620)
                 .frame(maxWidth: .infinity)
             }
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            actionFooter
+        }
+    }
+
+    private var actionFooter: some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .frame(height: 4)
+
+            HStack(spacing: 12) {
+                Button("CANCEL") { dismiss() }
+                    .buttonStyle(PixelButtonStyle())
+
+                Button(isCreating ? "CREATING…" : "CREATE GAME") {
+                    Task { _ = await create(isPrivate ? password : nil) }
+                }
+                .buttonStyle(PixelButtonStyle(filled: true))
+                .disabled(createDisabled)
+                .opacity(createDisabled ? 0.5 : 1)
+            }
+            .frame(maxWidth: 620)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+        }
+        .background(Newsprint.paper.ignoresSafeArea(edges: .bottom))
+    }
+
+    private var createDisabled: Bool {
+        isCreating || (isPrivate && password.isEmpty)
     }
 }

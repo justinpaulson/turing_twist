@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get "/.well-known/apple-app-site-association", to: "app_site_associations#show", format: false
+  get "invite/games/:id", to: "game_invites#show", as: :game_invite
+
   namespace :api do
     namespace :v1 do
       resource :session, only: [ :create, :destroy ]

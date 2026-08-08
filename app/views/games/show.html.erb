@@ -530,7 +530,7 @@
             <!-- Display Name Subrow -->
             <div class="player-email-subrow clickable-row" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.05); border: 2px solid rgba(0,0,0,0.1); cursor: pointer;">
               <div style="font-family: 'Courier New', monospace; font-size: 0.85rem; opacity: 0.7;">
-                ■ <%= player == @current_player ? "YOU" : (player.user&.display_name || player.user&.email_address) %>
+                ■ <%= player == @current_player ? "YOU" : player.public_display_name %>
               </div>
             </div>
 

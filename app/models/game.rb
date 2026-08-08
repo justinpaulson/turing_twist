@@ -12,6 +12,7 @@ class Game < ApplicationRecord
   MAX_PLAYERS = 10
   AI_PLAYERS_COUNT = 2
   TOTAL_ROUNDS = 5
+  SOLO_FALLBACK_DELAY = 45.seconds
 
   def current_round_object
     rounds.find_by(round_number: current_round)
@@ -19,6 +20,14 @@ class Game < ApplicationRecord
 
   def human_players
     players.where(is_ai: false)
+  end
+
+  def live_human_players
+    players.where(is_ai: false, is_virtual: false)
+  end
+
+  def virtual_players
+    players.where(is_virtual: true)
   end
 
   def ai_players
@@ -35,6 +44,15 @@ class Game < ApplicationRecord
 
   def active_human_players
     players.where(is_ai: false, is_eliminated: false)
+  end
+
+  def active_virtual_players
+    players.where(is_virtual: true, is_eliminated: false)
+  end
+
+  def question_for_round(round_number)
+    historical_question = virtual_players.first&.historical_answer_for(round_number)&.fetch("question", nil)
+    historical_question.presence || Round.generate_question(self)
   end
 
   def can_start?
