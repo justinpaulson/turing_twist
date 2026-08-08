@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GameDetailView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var session: SessionStore
     let gameID: Int
     @State private var game: GameDetail?
@@ -10,66 +11,77 @@ struct GameDetailView: View {
     var body: some View {
         ZStack {
             HalftoneBackground()
-            if let game {
-                ScrollView {
-                    VStack(spacing: 18) {
-                        gameHeader(game)
-                        if let errorMessage { ErrorBanner(message: errorMessage) }
+            VStack(spacing: 0) {
+                HStack {
+                    NewsprintBackButton { dismiss() }
+                    Spacer()
+                }
+                .frame(maxWidth: 920)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
+                .frame(maxWidth: .infinity)
 
-                        switch game.phase {
-                        case .waiting:
-                            WaitingRoomView(game: game, isWorking: isWorking) {
-                                await startGame()
+                ZStack {
+                    if let game {
+                        ScrollView {
+                            VStack(spacing: 18) {
+                                gameHeader(game)
+                                if let errorMessage { ErrorBanner(message: errorMessage) }
+
+                                switch game.phase {
+                                case .waiting:
+                                    WaitingRoomView(game: game, isWorking: isWorking) {
+                                        await startGame()
+                                    }
+                                case .answering, .reviewing:
+                                    if let round = game.round {
+                                        RoundView(
+                                            game: game,
+                                            round: round,
+                                            isWorking: isWorking,
+                                            submit: submitAnswer,
+                                            advance: advanceRound,
+                                            skip: skipRound
+                                        )
+                                    }
+                                case .voting:
+                                    if let voting = game.voting {
+                                        VotingView(
+                                            game: game,
+                                            voting: voting,
+                                            isWorking: isWorking,
+                                            vote: castVote,
+                                            finishVoting: finishVoting
+                                        )
+                                    }
+                                case .completed:
+                                    ResultsView(game: game)
+                                case .active:
+                                    LoadingView().padding(.vertical, 50)
+                                }
                             }
-                        case .answering, .reviewing:
-                            if let round = game.round {
-                                RoundView(
-                                    game: game,
-                                    round: round,
-                                    isWorking: isWorking,
-                                    submit: submitAnswer,
-                                    advance: advanceRound,
-                                    skip: skipRound
-                                )
-                            }
-                        case .voting:
-                            if let voting = game.voting {
-                                VotingView(
-                                    game: game,
-                                    voting: voting,
-                                    isWorking: isWorking,
-                                    vote: castVote,
-                                    finishVoting: finishVoting
-                                )
-                            }
-                        case .completed:
-                            ResultsView(game: game)
-                        case .active:
-                            LoadingView().padding(.vertical, 50)
+                            .frame(maxWidth: 920)
+                            .padding(16)
+                            .frame(maxWidth: .infinity)
                         }
+                        .refreshable { await refresh() }
+                    } else if let errorMessage {
+                        VStack(spacing: 18) {
+                            ErrorBanner(message: errorMessage)
+                            Button("TRY AGAIN") { Task { await refresh() } }
+                                .buttonStyle(PixelButtonStyle())
+                        }
+                        .padding()
+                        .frame(maxWidth: 600)
+                    } else {
+                        LoadingView()
                     }
-                    .frame(maxWidth: 920)
-                    .padding(16)
-                    .frame(maxWidth: .infinity)
                 }
-                .refreshable { await refresh() }
-            } else if let errorMessage {
-                VStack(spacing: 18) {
-                    ErrorBanner(message: errorMessage)
-                    Button("TRY AGAIN") { Task { await refresh() } }
-                        .buttonStyle(PixelButtonStyle())
-                }
-                .padding()
-                .frame(maxWidth: 600)
-            } else {
-                LoadingView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle("GAME #\(gameID)")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Newsprint.ink, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar(.hidden, for: .navigationBar)
         .task(id: gameID) {
             await refresh()
             while !Task.isCancelled {
@@ -215,7 +227,7 @@ private struct WaitingRoomView: View {
                     .overlay(Rectangle().stroke(Newsprint.paper, lineWidth: 2))
             }
             ShareLink(
-                item: URL(string: "https://turing.justinpaulson.com/games/\(game.id)")!,
+                item: inviteURL,
                 subject: Text("Join my Turing Twist game"),
                 message: Text(shareMessage)
             ) {
@@ -248,6 +260,10 @@ private struct WaitingRoomView: View {
         } else {
             "Join game #\(game.id)."
         }
+    }
+
+    private var inviteURL: URL {
+        URL(string: "https://turing.justinpaulson.com/invite/games/\(game.id)")!
     }
 
     private func avatar(_ player: Player) -> some View {

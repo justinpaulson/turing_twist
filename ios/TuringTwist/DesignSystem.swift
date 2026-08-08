@@ -125,15 +125,18 @@ struct PixelButtonStyle: ButtonStyle {
             .padding(.vertical, compact ? 10 : 14)
             .frame(maxWidth: compact ? nil : .infinity)
             .foregroundStyle(foreground(configuration))
-            .background(background(configuration))
+            .background {
+                Rectangle()
+                    .fill(background(configuration))
+                    .shadow(
+                        color: configuration.isPressed ? .clear : Newsprint.ink,
+                        radius: 0,
+                        x: configuration.isPressed ? 0 : 3,
+                        y: configuration.isPressed ? 0 : 3
+                    )
+            }
             .overlay(Rectangle().stroke(Newsprint.ink, lineWidth: 4))
             .offset(x: configuration.isPressed ? 0 : -1, y: configuration.isPressed ? 0 : -1)
-            .shadow(
-                color: configuration.isPressed ? .clear : Newsprint.ink,
-                radius: 0,
-                x: configuration.isPressed ? 0 : 3,
-                y: configuration.isPressed ? 0 : 3
-            )
     }
 
     private func foreground(_ configuration: Configuration) -> Color {
@@ -182,6 +185,79 @@ struct CharacterAvatar: View {
         .background(inverted ? Newsprint.ink : Newsprint.paper)
         .overlay(Rectangle().stroke(Newsprint.ink, lineWidth: 3))
         .accessibilityHidden(true)
+    }
+}
+
+struct ProfileLinkButton: View {
+    let user: User?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(initial)
+                    .font(Newsprint.headline(27))
+                    .foregroundStyle(Newsprint.paper)
+                    .frame(width: 44, height: 44)
+                    .background(Newsprint.ink)
+
+                Text("PROFILE")
+                    .font(Newsprint.mono(8, weight: .black))
+                    .tracking(0.5)
+            }
+            .padding(6)
+            .background {
+                Rectangle()
+                    .fill(Newsprint.paper)
+                    .shadow(color: Newsprint.ink, radius: 0, x: 3, y: 3)
+            }
+            .overlay(Rectangle().stroke(Newsprint.ink, lineWidth: 4))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Edit profile")
+    }
+
+    private var initial: String {
+        if let first = user?.displayName?.first(where: { !$0.isWhitespace }) {
+            return String(first).uppercased()
+        }
+        if let first = user?.emailAddress.first {
+            return String(first).uppercased()
+        }
+        return "?"
+    }
+}
+
+struct NewsprintBackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "chevron.left")
+        }
+        .buttonStyle(NewsprintBackButtonStyle())
+        .accessibilityLabel("Back")
+    }
+}
+
+private struct NewsprintBackButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 18, weight: .black))
+            .foregroundStyle(configuration.isPressed ? Newsprint.ink : Newsprint.paper)
+            .frame(width: 44, height: 44)
+            .background {
+                Rectangle()
+                    .fill(configuration.isPressed ? Newsprint.paper : Newsprint.ink)
+                    .shadow(
+                        color: configuration.isPressed ? .clear : Newsprint.ink,
+                        radius: 0,
+                        x: configuration.isPressed ? 0 : 3,
+                        y: configuration.isPressed ? 0 : 3
+                    )
+            }
+            .overlay(Rectangle().stroke(Newsprint.ink, lineWidth: 4))
+            .offset(x: configuration.isPressed ? 0 : -1, y: configuration.isPressed ? 0 : -1)
     }
 }
 

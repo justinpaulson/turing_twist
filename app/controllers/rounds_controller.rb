@@ -70,7 +70,7 @@ class RoundsController < ApplicationController
       # If this was the last answering round, go to voting page
       if @round.round_number >= Game::TOTAL_ROUNDS
         # Set voting started timestamp
-        @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
+        GameManager.new(@game).begin_voting!
         redirect_to voting_game_path(@game), notice: "All questions answered! Time to vote!"
       else
         # Create next answering round

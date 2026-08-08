@@ -53,6 +53,8 @@ bin/rails db:migrate
 
 Then open the Xcode project, select the `TuringTwist` scheme, and run on any iPhone or iPad simulator. The app uses Keychain for its bearer token and never stores the account password.
 
+Game invitations use Universal Links such as `https://turing.justinpaulson.com/invite/games/123`. They open the native app when it is installed, preserve the invitation through sign-in, and prefill the join screen. Until the App Store listing exists, people without the app see a web fallback. After publication, add the app's `https://apps.apple.com/...` listing URL as `ios.app_store_url` in Rails credentials (or expose it as `IOS_APP_STORE_URL` in the deployed environment); the same invitation link will then send people without the app to the App Store.
+
 ## Prerequisites
 
 - Ruby 3.3.4 or higher

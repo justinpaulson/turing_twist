@@ -56,7 +56,7 @@ class Api::V1::GameSerializer
         is_current_player: player == current_player,
         is_host: player.is_host?,
         is_ai: game.completed? ? player.is_ai? : nil,
-        display_name: game.completed? && !player.is_ai? ? (player.user&.display_name || player.user&.email_address) : nil,
+        display_name: game.completed? && !player.is_ai? ? player.public_display_name : nil,
         score: game.completed? ? player.score : nil
       }
     end
@@ -131,7 +131,7 @@ class Api::V1::GameSerializer
         player_id: player.id,
         character_name: player.character_name,
         character_avatar: player.character_avatar&.delete_suffix(".svg"),
-        display_name: player.is_ai? ? "AI PLAYER" : (player.user&.display_name || player.user&.email_address),
+        display_name: player.is_ai? ? "AI PLAYER" : player.public_display_name,
         is_current_player: player == current_player,
         is_ai: player.is_ai?,
         score: player.score || 0,

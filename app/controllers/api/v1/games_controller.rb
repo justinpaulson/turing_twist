@@ -37,6 +37,8 @@ class Api::V1::GamesController < Api::V1::BaseController
       game.add_ai_players!
     end
 
+    FillWaitingGameJob.set(wait: Game::SOLO_FALLBACK_DELAY).perform_later(game)
+
     render_game(game.reload, status: :created, message: "Game created! Waiting for more players...")
   end
 
@@ -48,22 +50,24 @@ class Api::V1::GamesController < Api::V1::BaseController
   end
 
   def join
-    if @game.players.exists?(user: current_user)
-      render_game(@game, message: "You're already in this game!")
-    elsif @game.players.count >= Game::MAX_PLAYERS
-      render_error("Game is full!", :conflict)
-    elsif !@game.waiting?
-      render_error("Game has already started!", :conflict)
-    elsif @game.private? && !@game.valid_password?(params[:password])
-      render_error("Incorrect password!", :forbidden)
-    else
-      character = @game.assign_next_character
-      @game.players.create!(
-        user: current_user,
-        character_name: character[:name],
-        character_avatar: character[:avatar]
-      )
-      render_game(@game.reload, message: "You've joined the game!")
+    @game.with_lock do
+      if @game.players.exists?(user: current_user)
+        render_game(@game, message: "You're already in this game!")
+      elsif @game.players.count >= Game::MAX_PLAYERS
+        render_error("Game is full!", :conflict)
+      elsif !@game.waiting?
+        render_error("Game has already started!", :conflict)
+      elsif @game.private? && !@game.valid_password?(params[:password])
+        render_error("Incorrect password!", :forbidden)
+      else
+        character = @game.assign_next_character
+        @game.players.create!(
+          user: current_user,
+          character_name: character[:name],
+          character_avatar: character[:avatar]
+        )
+        render_game(@game.reload, message: "You've joined the game!")
+      end
     end
   end
 

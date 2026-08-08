@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_07_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
   create_table "answers", force: :cascade do |t|
     t.integer "round_id", null: false
     t.integer "player_id", null: false
@@ -42,10 +42,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_07_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_host", default: false
+    t.boolean "is_virtual", default: false, null: false
+    t.json "historical_data"
     t.integer "score", default: 0, null: false
     t.string "character_name"
     t.string "character_avatar"
     t.index ["game_id"], name: "index_players_on_game_id"
+    t.index ["is_virtual"], name: "index_players_on_is_virtual"
     t.index ["user_id"], name: "index_players_on_user_id"
   end
 

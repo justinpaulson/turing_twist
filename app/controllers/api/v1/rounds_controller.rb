@@ -26,7 +26,7 @@ class Api::V1::RoundsController < Api::V1::BaseController
 
     @round.update!(status: :completed, ended_at: Time.current)
     if @round.round_number >= Game::TOTAL_ROUNDS
-      @game.update!(voting_started_at: Time.current) unless @game.voting_started_at
+      GameManager.new(@game).begin_voting!
       message = "All questions answered! Time to vote!"
     else
       GameManager.new(@game).create_next_round!
