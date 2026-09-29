@@ -34,6 +34,21 @@ struct GamesView: View {
 
                         if let errorMessage { ErrorBanner(message: errorMessage) }
 
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("SINGLE PLAYER")
+                                .font(Newsprint.headline(24))
+                            Text("Crack a case on your own. Answer five questions alongside two archived human players and two live AIs, then identify the machines.")
+                                .font(Newsprint.mono(13))
+                            Text("NO LOBBY WAIT • INTERNET REQUIRED")
+                                .font(Newsprint.mono(10, weight: .bold))
+                            Button(isCreating ? "OPENING CASE…" : "► PLAY SINGLE PLAYER") {
+                                Task { _ = await createGame(password: nil, mode: "solo") }
+                            }
+                            .buttonStyle(PixelButtonStyle(filled: true))
+                            .disabled(isCreating)
+                        }
+                        .newsprintCard()
+
                         ViewThatFits(in: .horizontal) {
                             HStack(spacing: 14) {
                                 Button("+ CREATE GAME") { showingCreateGame = true }
@@ -48,6 +63,8 @@ struct GamesView: View {
                                     .buttonStyle(PixelButtonStyle())
                             }
                         }
+
+                        .disabled(isCreating)
 
                         tabPicker
 
@@ -199,12 +216,12 @@ struct GamesView: View {
         }
     }
 
-    private func createGame(password: String?) async -> Bool {
-        guard let token = session.token else { return false }
+    private func createGame(password: String?, mode: String = "multiplayer") async -> Bool {
+        guard let token = session.token, !isCreating else { return false }
         isCreating = true
         defer { isCreating = false }
         do {
-            let game = try await APIClient.shared.createGame(password: password, token: token)
+            let game = try await APIClient.shared.createGame(password: password, mode: mode, token: token)
             showingCreateGame = false
             await loadGames()
             path.append(.game(game.id))
@@ -305,7 +322,7 @@ private struct GameCard: View {
     }
 
     private var header: String {
-        var value = "GAME #\(game.id)"
+        var value = game.mode == "solo" ? "SOLO CASE #\(game.id)" : "GAME #\(game.id)"
         if game.phase == .completed { value += " ★ COMPLETED" }
         else if isMine { value += " ★ YOUR GAME" }
         return value

@@ -10,6 +10,7 @@ class Api::V1::GameSerializer
       id: game.id,
       status: game.status,
       phase: phase,
+      mode: game.solo? ? "solo" : "multiplayer",
       private: game.private?,
       player_count: game.players.count,
       min_players: Game::MIN_PLAYERS,

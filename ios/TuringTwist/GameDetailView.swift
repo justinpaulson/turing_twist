@@ -27,6 +27,12 @@ struct GameDetailView: View {
                         ScrollView {
                             VStack(spacing: 18) {
                                 gameHeader(game)
+                                if game.mode == "solo" {
+                                    Text("SOLO CASE • Two players replay anonymous human answers from past games. Find the two live AIs.")
+                                        .font(Newsprint.mono(12))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .newsprintCard(padding: 12)
+                                }
                                 if let errorMessage { ErrorBanner(message: errorMessage) }
 
                                 switch game.phase {
@@ -57,6 +63,8 @@ struct GameDetailView: View {
                                     }
                                 case .completed:
                                     ResultsView(game: game)
+                                    Button("BACK TO GAMES") { dismiss() }
+                                        .buttonStyle(PixelButtonStyle(filled: true))
                                 case .active:
                                     LoadingView().padding(.vertical, 50)
                                 }

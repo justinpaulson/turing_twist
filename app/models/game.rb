@@ -30,6 +30,10 @@ class Game < ApplicationRecord
     players.where(is_virtual: true)
   end
 
+  def solo?
+    virtual_players.exists? && live_human_players.count == 1
+  end
+
   def ai_players
     players.where(is_ai: true)
   end
