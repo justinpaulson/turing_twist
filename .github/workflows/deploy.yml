@@ -132,3 +132,22 @@ jobs:
           bin/kamal deploy
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+  testflight:
+    name: Build and upload TestFlight
+    needs: deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, macOS, ARM64, turing-twist]
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    concurrency:
+      group: turing-twist-testflight
+      cancel-in-progress: false
+    steps:
+      - name: Check out the tested commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate, archive, and upload
+        run: script/testflight

@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+: "${GITHUB_RUN_NUMBER:?Run this release script from GitHub Actions}"
+: "${GITHUB_RUN_ATTEMPT:?Run attempt is required}"
+: "${RUNNER_TEMP:?Runner temp directory is required}"
+TURING_BUILD_NUMBER="${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+TURING_RELEASE_DIR="$(mktemp -d "${RUNNER_TEMP}/turing-release.XXXXXX")"
+trap 'rm -rf "$TURING_RELEASE_DIR"' EXIT
+
+# Use the commit checked out by Actions; never reset a developer's checkout.
+xcrun swiftc -module-cache-path "$TURING_RELEASE_DIR/swift-cache" \
+  ios/TuringTwist/Models.swift ios/Tests/ModelDecodingTests.swift \
+  -o "$TURING_RELEASE_DIR/model-tests"
+"$TURING_RELEASE_DIR/model-tests"
+xcodebuild -project ios/TuringTwist.xcodeproj -scheme TuringTwist \
+  -configuration Debug -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath "$TURING_RELEASE_DIR/SimulatorDerivedData" \
+  CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project ios/TuringTwist.xcodeproj -scheme TuringTwist \
+  -configuration Release -destination 'generic/platform=iOS' \
+  -derivedDataPath "$TURING_RELEASE_DIR/ArchiveDerivedData" \
+  -archivePath "$TURING_RELEASE_DIR/TuringTwist.xcarchive" \
+  CURRENT_PROJECT_VERSION="$TURING_BUILD_NUMBER" -allowProvisioningUpdates archive
+xcodebuild -exportArchive -archivePath "$TURING_RELEASE_DIR/TuringTwist.xcarchive" \
+  -exportOptionsPlist ios/Release/ExportOptions.plist \
+  -exportPath "$TURING_RELEASE_DIR/upload" -allowProvisioningUpdates
+
+# ExportOptions uses destination=upload and preserves our unique run/attempt number.
+# Xcode uses the owner's existing signed-in account and signing keychain.
+{
+  echo "### TestFlight upload accepted"
+  echo "Build: **$TURING_BUILD_NUMBER**"
+  echo "Source: \`$GITHUB_SHA\`"
+  echo "[Check Apple processing and tester availability](https://appstoreconnect.apple.com/apps/6799463958/testflight)"
+  echo "Apple processing and group distribution occur after upload."
+} >> "$GITHUB_STEP_SUMMARY"
