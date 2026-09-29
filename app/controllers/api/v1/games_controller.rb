@@ -18,6 +18,12 @@ class Api::V1::GamesController < Api::V1::BaseController
   end
 
   def create
+    solo = params[:mode] == "solo"
+    unless params[:mode].blank? || [ "solo", "multiplayer" ].include?(params[:mode])
+      render_error("Choose single player or multiplayer.", :unprocessable_entity)
+      return
+    end
+
     game = Game.new(
       password: params[:password].presence,
       status: :waiting,
@@ -35,11 +41,20 @@ class Api::V1::GamesController < Api::V1::BaseController
         character_avatar: character[:avatar]
       )
       game.add_ai_players!
+      if solo && !WaitingGameFiller.new(game).fill_and_start!
+        raise ActiveRecord::Rollback
+      end
     end
 
-    FillWaitingGameJob.set(wait: Game::SOLO_FALLBACK_DELAY).perform_later(game)
+    if solo && !game.persisted?
+      render_error("No single-player case is available yet. Please try again later or create a multiplayer game.", :unprocessable_entity)
+      return
+    end
 
-    render_game(game.reload, status: :created, message: "Game created! Waiting for more players...")
+    FillWaitingGameJob.set(wait: Game::SOLO_FALLBACK_DELAY).perform_later(game) unless solo
+
+    message = solo ? "Single-player case started!" : "Game created! Waiting for more players..."
+    render_game(game.reload, status: :created, message: message)
   end
 
   def show

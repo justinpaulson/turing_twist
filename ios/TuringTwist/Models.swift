@@ -23,6 +23,7 @@ struct GameListResponse: Decodable {
 }
 
 struct GameSummary: Codable, Identifiable, Hashable {
+    let mode: String?
     let id: Int
     let status: String
     let phase: GamePhase
@@ -38,7 +39,7 @@ struct GameSummary: Codable, Identifiable, Hashable {
     let createdAt: Date
 
     enum CodingKeys: String, CodingKey {
-        case id, status, phase, playerCount, minPlayers, maxPlayers, waitingFor
+        case id, status, phase, playerCount, minPlayers, maxPlayers, waitingFor, mode
         case currentRound, totalRounds, isMember, isHost, createdAt
         case isPrivate = "private"
     }
@@ -54,6 +55,7 @@ enum GamePhase: String, Codable, Hashable {
 }
 
 struct GameDetail: Decodable, Identifiable {
+    let mode: String?
     let id: Int
     let status: String
     let phase: GamePhase
@@ -77,7 +79,7 @@ struct GameDetail: Decodable, Identifiable {
     let message: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, status, phase, playerCount, minPlayers, maxPlayers, waitingFor
+        case id, status, phase, playerCount, minPlayers, maxPlayers, waitingFor, mode
         case currentRound, totalRounds, isMember, isHost, createdAt, currentPlayerId
         case invitePassword, pointsPerCorrectGuess, players, round, voting, leaderboard, message
         case isPrivate = "private"
@@ -97,6 +99,11 @@ struct Player: Decodable, Identifiable {
     let isAI: Bool?
     let displayName: String?
     let score: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id, characterName, characterAvatar, isCurrentPlayer, isHost, displayName, score
+        case isAI = "isAi"
+    }
 }
 
 struct RoundSnapshot: Decodable {
@@ -152,6 +159,12 @@ struct LeaderboardEntry: Decodable, Identifiable {
     let pointsFromGuesses: Int
     let pointsFromDeception: Int
     let answers: [GameAnswer]
+
+    enum CodingKeys: String, CodingKey {
+        case playerId, characterName, characterAvatar, displayName, isCurrentPlayer
+        case score, correctVotes, votesReceived, pointsFromGuesses, pointsFromDeception, answers
+        case isAI = "isAi"
+    }
 }
 
 struct APIErrorResponse: Decodable {

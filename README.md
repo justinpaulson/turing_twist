@@ -43,6 +43,14 @@ The twist? There are always 2 AI players in the mix, powered by LLM technology, 
 
 The native SwiftUI client lives in [`ios/TuringTwist.xcodeproj`](ios/TuringTwist.xcodeproj). It mirrors the web game flow—account creation and sign-in, public and private games, waiting rooms, five answer/review rounds, final AI voting, live state refresh, results, and profile editing—while preserving the black-and-white newspaper and retro pixel-art aesthetic.
 
+### Single player
+
+Tap **Play Single Player** on the iOS games screen to start a five-round case immediately. You play alongside two anonymous archived human players and two live AIs, then vote for the two machines. An internet connection is required. Solo cases appear in My Games and can be resumed.
+
+Only completed public games supply archived human answers; private games, placeholder answers, and your own past answers are excluded. If no eligible case exists, the app shows an error without leaving an empty lobby. Multiplayer creation and joining remain available.
+
+The mobile API accepts `POST /api/v1/games` with `{ "mode": "solo" }`. The response reports `mode: "solo"` and starts in the answering phase. Omitting `mode` preserves multiplayer behavior.
+
 The checked-in configuration targets iOS 17 or newer and connects to `https://turing.justinpaulson.com/api/v1`. To run against a local Rails server, add the `TURING_TWIST_API_URL` environment variable to the Xcode scheme with a value such as `http://localhost:3069/api/v1`.
 
 Before using the native app against a deployment, run the new session-token migration:

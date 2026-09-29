@@ -96,11 +96,11 @@ final class APIClient {
         try await request("games/\(id)", token: token)
     }
 
-    func createGame(password: String?, token: String) async throws -> GameDetail {
+    func createGame(password: String?, mode: String = "multiplayer", token: String) async throws -> GameDetail {
         try await request(
             "games",
             method: "POST",
-            body: PasswordBody(password: password),
+            body: CreateGameBody(password: password, mode: mode),
             token: token
         )
     }
@@ -203,6 +203,11 @@ private struct SignInBody: Encodable {
 
 private struct PasswordBody: Encodable {
     let password: String?
+}
+
+private struct CreateGameBody: Encodable {
+    let password: String?
+    let mode: String
 }
 
 private struct AnswerBody: Encodable {
