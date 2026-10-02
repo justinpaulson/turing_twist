@@ -6,10 +6,10 @@
   </div>
   <ol style="font-family: 'Courier New', monospace; line-height: 2; margin-left: 1.5rem;">
     <li>5-8 players join the game (2 will always be AI)</li>
-    <li>Play 5 rounds - each round, everyone answers a personal question</li>
+    <li>Play <%= Game::TOTAL_ROUNDS %> rounds - each round, everyone answers a personal question</li>
     <li>Read all answers and vote for who you think the 2 AIs are</li>
     <li>Score points for correct AI guesses and by fooling other players into voting for you</li>
-    <li>After 5 rounds, the player with the highest score wins!</li>
+    <li>After <%= Game::TOTAL_ROUNDS %> rounds, the player with the highest score wins!</li>
   </ol>
 </div>
 

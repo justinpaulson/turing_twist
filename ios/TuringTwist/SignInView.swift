@@ -63,7 +63,7 @@ struct SignInView: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         BoxHeader(title: "► How to Play")
-                        rule("1", "Answer five creative questions")
+                        rule("1", "Answer three creative questions")
                         rule("2", "Study every player's answers")
                         rule("3", "Find the two hidden AI players")
                         rule("4", "Score for detection and deception")

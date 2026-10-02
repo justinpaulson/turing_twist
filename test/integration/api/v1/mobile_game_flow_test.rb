@@ -139,9 +139,9 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
   test "final vote completes the game and only then reveals AI identities" do
     game = create_game_for(@user)
     add_human_players(game, 2)
-    game.update!(status: :active, current_round: 5, voting_started_at: Time.current)
+    game.update!(status: :active, current_round: Game::TOTAL_ROUNDS, voting_started_at: Time.current)
 
-    5.times do |index|
+    Game::TOTAL_ROUNDS.times do |index|
       round = game.rounds.create!(
         round_number: index + 1,
         question: "Question #{index + 1}",
@@ -186,7 +186,7 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
     assert_equal 5, response.parsed_body["leaderboard"].count
   end
 
-  test "single player starts immediately and completes all five rounds and voting" do
+  test "single player starts immediately and completes exactly three rounds and voting" do
     create_solo_archive
     assert_no_enqueued_jobs(only: FillWaitingGameJob) do
       post api_v1_games_url, params: { mode: "solo" }, headers: auth_headers, as: :json
@@ -194,6 +194,7 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
     assert_response :created
     game = Game.find(response.parsed_body.fetch("id"))
     assert_equal "solo", response.parsed_body["mode"]
+    assert_equal 3, response.parsed_body["total_rounds"]
     assert_equal "answering", response.parsed_body["phase"]
     assert_equal 1, game.live_human_players.count
     assert_equal 2, game.virtual_players.count
@@ -205,7 +206,8 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
     get api_v1_game_url(game), headers: auth_headers(issue_token(guest)), as: :json
     assert_response :forbidden
 
-    Game::TOTAL_ROUNDS.times do |index|
+    assert game.virtual_players.all? { |player| player.historical_answers.length == 3 }
+    3.times do |index|
       round = game.reload.current_round_object
       assert_equal "Solo question #{index + 1}?", round.question
       game.virtual_players.each { |player| VirtualPlayerService.new(player, round).submit_answer }
@@ -223,6 +225,8 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
     assert_equal "voting", response.parsed_body["phase"]
+    assert_equal [ 1, 2, 3 ], game.rounds.order(:round_number).pluck(:round_number)
+    assert response.parsed_body.dig("voting", "candidates").all? { |candidate| candidate["answers"].length == 3 }
     CollectVirtualVotesJob.perform_now(game.reload)
     game.ai_players.each do |player|
       post api_v1_game_votes_url(game), params: { voted_for_id: player.id }, headers: auth_headers, as: :json
@@ -266,6 +270,7 @@ class Api::V1::MobileGameFlowTest < ActionDispatch::IntegrationTest
 
   private
 
+  # Five-round archives remain usable by new three-round cases.
   def create_solo_archive
     game = Game.create!(status: :completed, current_round: 5, round_count: 5)
     add_human_players(game, 2)

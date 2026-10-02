@@ -10,14 +10,14 @@ Turing Twist features a **black and white newspaper style** with **old school Ni
 
 ## Game Overview
 
-Turing Twist is a multiplayer web game that challenges players to distinguish between human and AI responses. Each game consists of 5 rounds where:
+Turing Twist is a multiplayer web game that challenges players to distinguish between human and AI responses. Each game consists of 3 rounds where:
 1. Players answer personal questions
 2. Everyone reads all anonymous responses
 3. Players vote for who they think the 2 AI players are
 4. Points are awarded for correct AI identifications
 5. Bonus points for fooling other players into thinking you're an AI!
 
-The twist? There are always 2 AI players in the mix, powered by LLM technology, making their responses surprisingly human-like! After 5 rounds, the player with the highest score wins!
+The twist? There are always 2 AI players in the mix, powered by LLM technology, making their responses surprisingly human-like! After 3 rounds, the player with the highest score wins!
 
 ## Features
 
@@ -41,11 +41,11 @@ The twist? There are always 2 AI players in the mix, powered by LLM technology, 
 
 ## iPhone and iPad App
 
-The native SwiftUI client lives in [`ios/TuringTwist.xcodeproj`](ios/TuringTwist.xcodeproj). It mirrors the web game flow—account creation and sign-in, public and private games, waiting rooms, five answer/review rounds, final AI voting, live state refresh, results, and profile editing—while preserving the black-and-white newspaper and retro pixel-art aesthetic.
+The native SwiftUI client lives in [`ios/TuringTwist.xcodeproj`](ios/TuringTwist.xcodeproj). It mirrors the web game flow—account creation and sign-in, public and private games, waiting rooms, three answer/review rounds, final AI voting, live state refresh, results, and profile editing—while preserving the black-and-white newspaper and retro pixel-art aesthetic.
 
 ### Single player
 
-Tap **Play Single Player** on the iOS games screen to start a five-round case immediately. You play alongside two anonymous archived human players and two live AIs, then vote for the two machines. An internet connection is required. Solo cases appear in My Games and can be resumed.
+Tap **Play Single Player** on the iOS games screen to start a three-round case immediately. You play alongside two anonymous archived human players and two live AIs, then vote for the two machines. An internet connection is required. Solo cases appear in My Games and can be resumed.
 
 Only completed public games supply archived human answers; private games, placeholder answers, and your own past answers are excluded. If no eligible case exists, the app shows an error without leaving an empty lobby. Multiplayer creation and joining remain available.
 
@@ -154,7 +154,7 @@ bundle exec brakeman
 4. **Answer Questions** - Each round presents a personal question to answer
 5. **Vote on Responses** - Read all anonymous answers and vote for who you think the 2 AIs are
 6. **Score Points** - Earn points for correctly identifying AI responses and fooling other players
-7. **Complete 5 Rounds** - Play through all 5 rounds of questions and voting
+7. **Complete 3 Rounds** - Play through all 3 rounds of questions and voting
 8. **Win the Game** - Have the highest score at the end!
 
 ## Game Rules
@@ -162,13 +162,13 @@ bundle exec brakeman
 - **Minimum Players**: 5 (including 2 AI)
 - **Maximum Players**: 10 (including 2 AI)
 - **AI Players**: Always 2 per game
-- **Total Rounds**: 5 rounds per game
+- **Total Rounds**: 3 rounds per game
 - **Scoring**:
   - 5-6 players: 2 points per correct AI guess (max 4 points/round)
   - 7-8 players: 3 points per correct AI guess (max 6 points/round)
   - 9-10 players: 4 points per correct AI guess (max 8 points/round)
   - 1 point for each vote received as an AI (humans only - deception bonus!)
-- **Victory**: Player with the highest score after 5 rounds wins
+- **Victory**: Player with the highest score after 3 rounds wins
 
 ## Project Structure
 

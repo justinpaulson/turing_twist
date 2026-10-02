@@ -15,7 +15,7 @@ struct VotingView: View {
             VStack(spacing: 8) {
                 Text("FINAL PHASE").font(Newsprint.mono(12, weight: .bold)).tracking(2)
                 Text("WHO ARE THE AIS?").font(Newsprint.headline(29))
-                Text("Review all five answers from each player. Choose exactly two suspects.")
+                Text("Review all \(game.totalRounds) answers from each player. Choose exactly two suspects.")
                     .font(Newsprint.mono(13))
                     .multilineTextAlignment(.center)
             }

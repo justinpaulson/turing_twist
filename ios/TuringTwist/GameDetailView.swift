@@ -297,7 +297,7 @@ private struct WaitingRoomView: View {
     private var rules: some View {
         VStack(alignment: .leading, spacing: 0) {
             BoxHeader(title: "► How to Play")
-            rule("1", "ANSWER 5 QUESTIONS", "Everyone—including two hidden AIs—answers each prompt.")
+            rule("1", "ANSWER \(game.totalRounds) QUESTIONS", "Everyone—including two hidden AIs—answers each prompt.")
             rule("2", "VOTE FOR 2 AIS", "Review every answer and identify the machines.")
             rule("3", "SCORE POINTS", "Earn points for correct guesses and deceiving other players.")
         }

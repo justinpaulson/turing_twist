@@ -231,7 +231,7 @@ class Round < ApplicationRecord
     # Get available questions that haven't been used yet
     available_questions = QUESTIONS - used_questions
 
-    # If we've used all questions, start over (shouldn't happen with 212 questions and 5 rounds)
+    # If we've used all questions, start over (unlikely with the question pool and short games)
     available_questions = QUESTIONS if available_questions.empty?
 
     available_questions.sample

@@ -229,7 +229,7 @@
   <% elsif @round.completed? %>
     <!-- Completed Round - Different handling for answering vs voting rounds -->
     <% if @round.round_number <= Game::TOTAL_ROUNDS %>
-      <!-- This was an answering round (1-5), go straight to next round -->
+      <!-- This was an answering round, go straight to next round -->
       <% next_round = @game.current_round_object %>
       <% if next_round && next_round.id != @round.id %>
         <div class="box" style="background: #000000; color: #ffffff; padding: 2rem; margin: 2rem 0; text-align: center;">

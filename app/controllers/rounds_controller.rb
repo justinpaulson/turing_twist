@@ -4,19 +4,19 @@ class RoundsController < ApplicationController
   def show
     @current_player = @game.players.find_by(user: Current.user)
 
-    # Redirect old voting rounds (round 6+) to the voting page
+    # Redirect old rounds beyond the question limit to the voting page
     if @round.round_number > Game::TOTAL_ROUNDS
       redirect_to voting_game_path(@game) and return
     end
 
     # Auto-redirect for completed rounds
     if @round.completed?
-      # If this was the last answering round (round 5), go to voting
+      # If this was the last answering round, go to voting
       if @round.round_number >= Game::TOTAL_ROUNDS
         redirect_to voting_game_path(@game) and return
       end
 
-      # For earlier answering rounds (1-4), go to next round
+      # For earlier answering rounds, go to next round
       next_round = @game.current_round_object
       if next_round && next_round.id != @round.id
         redirect_to game_round_path(@game, next_round) and return

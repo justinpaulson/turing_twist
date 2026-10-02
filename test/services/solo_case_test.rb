@@ -85,6 +85,26 @@ class SoloCaseTest < ActiveSupport::TestCase
     assert player.errors[:historical_data].present?
   end
 
+  test "saved five-answer virtual players can still be scored" do
+    WaitingGameFiller.new(@waiting_game).fill_and_start!
+    player = @waiting_game.virtual_players.first
+    historical_data = player.historical_data.deep_dup
+    (4..5).each do |number|
+      historical_data["answers"] << {
+        "round_number" => number,
+        "question" => "Legacy question #{number}?",
+        "content" => "Legacy answer #{number}"
+      }
+    end
+    # Simulate a persisted solo player created before the round limit changed.
+    player.update_column(:historical_data, historical_data)
+
+    GameManager.new(@waiting_game).process_voting_results!
+
+    assert @waiting_game.reload.completed?
+    assert_equal 5, player.reload.historical_answers.length
+  end
+
   test "the game API presents historical seats as ordinary human players" do
     WaitingGameFiller.new(@waiting_game).fill_and_start!
     @waiting_game.update!(status: :completed)

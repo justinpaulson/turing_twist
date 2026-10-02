@@ -52,6 +52,36 @@ class GameFlowTest < ActionDispatch::IntegrationTest
     assert first_round.question.present?
   end
 
+  test "multiplayer goes to voting after exactly three question rounds" do
+    game = create_game_with_players(player_count: 3)
+    host = game.human_players.first
+    post session_url, params: { email_address: host.user.email_address, password: "password123" }
+    GameManager.new(game).start_game!
+
+    3.times do |index|
+      round = game.reload.current_round_object
+      assert_equal index + 1, round.round_number
+      game.players.each do |player|
+        round.answers.create!(player: player, content: "Answer #{index + 1}", submitted_at: Time.current)
+      end
+      round.update!(status: :reviewing)
+      post start_voting_game_round_url(game, round.round_number)
+
+      if index < 2
+        assert_redirected_to game_round_path(game, index + 2)
+        assert_not game.reload.all_rounds_complete?
+      else
+        assert_redirected_to voting_game_path(game)
+        assert game.reload.all_rounds_complete?
+        assert game.voting_started_at.present?
+      end
+    end
+
+    assert_equal [ 1, 2, 3 ], game.rounds.order(:round_number).pluck(:round_number)
+    get voting_game_url(game)
+    assert_response :success
+  end
+
   test "player can submit answer during answering phase" do
     game = create_game_with_players(player_count: 5)
     game.update!(status: :active, current_round: 1)

@@ -37,7 +37,7 @@ struct GamesView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("SINGLE PLAYER")
                                 .font(Newsprint.headline(24))
-                            Text("Crack a case on your own. Answer five questions alongside two archived human players and two live AIs, then identify the machines.")
+                            Text("Crack a case on your own. Answer three questions alongside two archived human players and two live AIs, then identify the machines.")
                                 .font(Newsprint.mono(13))
                             Text("NO LOBBY WAIT • INTERNET REQUIRED")
                                 .font(Newsprint.mono(10, weight: .bold))
@@ -350,7 +350,7 @@ private struct CreateGameSheet: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         BoxHeader(title: "► How to Play")
-                        Text("Five rounds. Two hidden AI players. Two final votes. Score for correct guesses and for fooling your friends.")
+                        Text("Three rounds. Two hidden AI players. Two final votes. Score for correct guesses and for fooling your friends.")
                             .font(Newsprint.mono(14))
                             .padding([.horizontal, .bottom], 16)
                     }

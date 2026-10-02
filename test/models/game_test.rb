@@ -139,9 +139,9 @@ class GameTest < ActiveSupport::TestCase
   end
 
   test "all_rounds_complete? returns true when all rounds are completed" do
-    game = Game.create!(status: :active, current_round: 5)
+    game = Game.create!(status: :active, current_round: Game::TOTAL_ROUNDS)
 
-    # Create 5 completed rounds
+    # Create all completed question rounds
     Game::TOTAL_ROUNDS.times do |i|
       game.rounds.create!(round_number: i + 1, question: "Question #{i + 1}", status: :completed)
     end
@@ -149,11 +149,10 @@ class GameTest < ActiveSupport::TestCase
     assert game.all_rounds_complete?
   end
 
-  test "all_rounds_complete? returns false when rounds are not completed" do
-    game = Game.create!(status: :active, current_round: 3)
+  test "all_rounds_complete? returns false before the third round" do
+    game = Game.create!(status: :active, current_round: 2)
 
-    # Create only 3 rounds
-    3.times do |i|
+    2.times do |i|
       game.rounds.create!(round_number: i + 1, question: "Question #{i + 1}", status: :completed)
     end
 

@@ -66,8 +66,9 @@ class Player < ApplicationRecord
   end
 
   def historical_data_is_complete
-    if historical_answers.length != Game::TOTAL_ROUNDS
-      errors.add(:historical_data, "must contain #{Game::TOTAL_ROUNDS} answers")
+    # Older saved solo games can contain more answers than the current game length.
+    if historical_answers.length < Game::TOTAL_ROUNDS
+      errors.add(:historical_data, "must contain at least #{Game::TOTAL_ROUNDS} answers")
       return
     end
 

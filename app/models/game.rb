@@ -11,7 +11,7 @@ class Game < ApplicationRecord
   MIN_PLAYERS = 5
   MAX_PLAYERS = 10
   AI_PLAYERS_COUNT = 2
-  TOTAL_ROUNDS = 5
+  TOTAL_ROUNDS = 3
   SOLO_FALLBACK_DELAY = 45.seconds
 
   def current_round_object
