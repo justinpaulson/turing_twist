@@ -1,0 +1,19 @@
+.studio-launch {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  background: rgb(98% 97% 95%);
+  animation: studio-launch-dismiss 0s 2s forwards;
+}
+.studio-launch img {
+  display: block;
+  width: min(360px, 72vmin);
+  height: auto;
+  max-height: 72dvh;
+  object-fit: contain;
+}
+@keyframes studio-launch-dismiss { to { visibility: hidden; pointer-events: none; } }
+
+.studio-launch-complete .studio-launch { display: none; }
